@@ -62,20 +62,11 @@ d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.824918
     if (cwd===undefined){
       cwd=1;
       console.log(cwd)
-  }
-
+    }
 });  
 
 
 function initMap() {
-
-    wd = defaults["wd"];
-    ws = defaults["ws"];
-    Q = defaults["Q"];
-    mw = defaults["mw"];
-    sc= defaults["sc"];
-    latitude = defaults["lat"];
-    longitude = defaults["lon"];
     //setTimeout(initMap,10000)
     var a = Math.floor(Math.random() * 180);
          // var max;
@@ -86,12 +77,9 @@ function initMap() {
       mapTypeId: 'satellite',
       labels:true
   });
-
-
     translate_coordinates('#FEFB35', 'Yellow', 30); //yellow
     translate_coordinates('#FC6215', 'Orange', 160);
     translate_coordinates('#FF0000', 'Red', 1100);
-
 }
 
 
