@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head >    
+  		<!-- Plugins and Libraries -->
+	<script type="text/javascript" src="assets/js/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/js/jquery-ui.min.js"></script>
+	<script type='text/javascript' src='assets/js/math.min.js'></script>
+	<script type="text/javascript" 
+          src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+	<script type="text/javascript" 
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+
+    <script type='text/javascript' src="config/formulas.js"></script>
+    <script type='text/javascript' src="assets/js/plume.js"></script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGXaF9n_XgHUHMaTn0wiP9yDqVB5S0SrA&callback=initMap">
+    
+    </script>
+
+    
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Polygon Arrays</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+       #container{
+			height:100%;
+		}
+      #map {
+      	float: left;
+        height: 100%;
+        width: 75%;
+        box-sizing: border-box;
+		padding: 10px;
+      }
+      #data{
+      	float:right;
+      	width:30%;
+      	height: 100%;
+      	box-sizing: border-box;
+		padding: 10px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+
+  </head>
+  
+  <body>
+
+	<div id="container">
+    	<div id="map"></div>
+    	<div id="data"></div>
+	</div>
+  </body>
+</html>

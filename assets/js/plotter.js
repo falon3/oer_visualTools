@@ -20,10 +20,12 @@ function needs_cunningham_kludge() {
 }
 
 function init(formulas_group) {
+	console.log("FORM", formulas_group);
 	//load the specific formulas group and set that as the global variable formulas
 	//var formulas_group = _GET('unit', 'default');
 	formulas = all_formulas[formulas_group];
 	populate_options();
+	console.log("FORM", formulas);
 
 	//initialize the tabs
 	$('#tabs').tabs();
