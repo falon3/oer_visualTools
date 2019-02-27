@@ -2,20 +2,32 @@
 ///  CODE ADAPTED FROM https://github.com/touhid55/GaussianPlume
 
 // "wd" is wind direction, 
-//     "ws" is wind speed, 
-//     "Q" is amount of material released, 
+//     "ws" is wind speed, [Uref]
+//     "Q" is amount of material released, [source strength of contaminant I, μg/s]
 //     "mw" is molecular weight, 
 //     "sc" is stability class and 
 //     "lat","lon" are latitude and longitude respectively.
+
+/* NEED USER PROVIDED: 
+h (physical height of the stack in meters)
+y and z and a range for x
+Q is user provided
+sc stability class (rural or urban A,B,C,D,E,F)
+lat/lon coordinates or a translator from city selection or can be selected by clicking or something (later)
+
+*/
+
 var defaults = 
 {
-  "wd":90, // it's wd-90 
+  "wd": 90, // it's wd-90 
   "ws":5,
   "Q": 25000,
   "mw": 17,
   "sc": "rd",
   "lat": 53.5253,
-  "lon": -113.525704
+  "lon": -113.525704,
+  "h": 10,
+  "Xmax": 10000
 };
 // This example creates a simple polygon representing the Bermuda Triangle.
 // When the user clicks on the polygon an info window opens, showing
@@ -40,9 +52,12 @@ var mw = defaults["mw"];
 var sc= defaults["sc"];
 var latitude = defaults["lat"];
 var longitude = defaults["lon"];
+var h = defaults["h"];
+var Xmax = defaults["Xmax"];
 var map;
+var zoom = 12;
+var center= {lat: latitude, lng: longitude};
 var infoWindow;
-var rotation_angle_degs =wd;
 
 
 
@@ -54,6 +69,8 @@ d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.824918
     cws = cws.join("");
     console.log(cws)
 
+
+    // THIS DOESNT LOOK RIGHT FOR GETTING WIND DIRECTION?? HARDCODED
     var cwd = JSON.stringify(data.winddisplay);
     // var myString = cwd;
     var cwd = cwd.split("6 mph");
@@ -65,21 +82,32 @@ d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.824918
     }
 });  
 
+function drawNewMap(){
+    //keep old zoom
+    if (map) {
+        zoom = map.getZoom();
+        center['lat'] = map.getCenter().lat();
+        center['lng'] = map.getCenter().lng();
+    }   
+    map = new google.maps.Map(document.getElementById('map'), {
+      zoom: zoom,
+      center: center,
+      mapTypeId: 'satellite',
+      labels:true
+  });
+    initMap();
+
+}
+
 
 function initMap() {
     //setTimeout(initMap,10000)
     var a = Math.floor(Math.random() * 180);
          // var max;
-    map = new google.maps.Map(document.getElementById('map'), {
-
-      zoom: 12,
-      center: {lat: latitude, lng: longitude},
-      mapTypeId: 'satellite',
-      labels:true
-  });
+    // cdes5  what is this 30, 160, 1100?????
     translate_coordinates('#FEFB35', 'Yellow', 30); //yellow
     translate_coordinates('#FC6215', 'Orange', 160);
-    translate_coordinates('#FF0000', 'Red', 1100);
+    translate_coordinates('#FF0000', 'Red', 1100); //1100
 }
 
 
@@ -262,182 +290,82 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
         9900,
         10000
         ];
-        x1 = [
-        0.0000005,
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900,
-        1000,
-        1100,
-        1200,
-        1300,
-        1400,
-        1500,
-        1600,
-        1700,
-        1800,
-        1900,
-        2000,
-        2100,
-        2200,
-        2300,
-        2400,
-        2500,
-        2600,
-        2700,
-        2800,
-        2900,
-        3000,
-        3100,
-        3200,
-        3300,
-        3400,
-        3500,
-        3600,
-        3700,
-        3800,
-        3900,
-        4000,
-        4100,
-        4200,
-        4300,
-        4400,
-        4500,
-        4600,
-        4700,
-        4800,
-        4900,
-        5000,
-        5100,
-        5200,
-        5300,
-        5400,
-        5500,
-        5600,
-        5700,
-        5800,
-        5900,
-        6000,
-        6100,
-        6200,
-        6300,
-        6400,
-        6500,
-        6600,
-        6700,
-        6800,
-        6900,
-        7000,
-        7100,
-        7200,
-        7300,
-        7400,
-        7500,
-        7600,
-        7700,
-        7800,
-        7900,
-        8000,
-        8100,
-        8200,
-        8300,
-        8400,
-        8500,
-        8600,
-        8700,
-        8800,
-        8900,
-        9000,
-        9100,
-        9200,
-        9300,
-        9400,
-        9500,
-        9600,
-        9700,
-        9800,
-        9900,
-        10000
-        ]
-        //console.log(x1.length);
+        
         for (i in x){
-            //rotation_angle_degs = rotation_angle_degs;
-            xoffset_mtrs[i] = xoffset_mtrs;
-            yoffset_mtrs[i] = yoffset_mtrs;
-            //  RADIANS[i] =RADIANS;
-            olat[i] = olat;
-            olon[i]= olon;
-            //d2rlat[i] =d2rlat ;
-            //x[i] = count;
-            if (sc=="ra") {
-             sigy[i] = 0.22*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                   sigz[i] = 0.20*x[i];//0.016*x[i]*Math.pow((1+0.0003*x[i]),-1);
-               }
-               else if(sc=="rb"){
-                  sigy[i] = 0.16*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                  sigz[i] = 0.12*x[i];
-              }
-              else if(sc=="rc"){
-                  sigy[i] = 0.11*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                  sigz[i] = 0.08*x[i]*Math.pow((1+0.0002*x[i]), -0.5);
-              }
-              else if(sc=="rd"){
-                  sigy[i] = 0.08*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                  sigz[i] = 0.06*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
-              }
-              else if(sc=="re"){
-                  sigy[i] = 0.06*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                  sigz[i] = 0.03*x[i]*Math.pow((1+0.0003*x[i]), -1);
-              }
-              else if(sc=="rf"){
-                  sigy[i] = 0.04*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                  sigz[i] = 0.016*x[i]*Math.pow((1+0.0003*x[i]), -1);
-              }
-              else if(sc=="ua"||"ub"){
-                  sigy[i] = 0.32*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                  sigz[i] = 0.24*x[i]*Math.pow((1+0.001*x[i]), -0.5);
-              }
-              else if(sc=="uc"){
-                  sigy[i] = 0.22*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                  sigz[i] = 0.20*x[i];
-              }
-              else if(sc=="ud"){
-                  sigy[i] = 0.16*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                  sigz[i] = 0.14*x[i]*Math.pow((1+0.003*x[i]), -0.5);
-              }
-              else if(sc=="ue"||"uf"){
-                  sigy[i] = 0.11*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                  sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
-              }
-       
-              sigyn[i] = -sigy[i];
+            if (i <= Xmax) {
+                //rotation_angle_degs = rotation_angle_degs;
+                xoffset_mtrs[i] = xoffset_mtrs;
+                yoffset_mtrs[i] = yoffset_mtrs;
+                //  RADIANS[i] =RADIANS;
+                olat[i] = olat;
+                olon[i]= olon;
+                //d2rlat[i] =d2rlat ;
+                //x[i] = count;
 
-           ccen[i] = (Q*Math.pow(10, 3))*24.45/(3.1416*sigy[i]*sigz[i]*ws*mw); //ppm
-           //console.log(ccen[i])
-           y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
-           //console.log(y5[i]);
-           yn[i] = sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5)
-           // console.log(y5)
-           // console
+                ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
+                if (sc=="ra") {
+                 sigy[i] = 0.22*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+                       sigz[i] = 0.20*x[i];//0.016*x[i]*Math.pow((1+0.0003*x[i]),-1);
+                   }
+                   else if(sc=="rb"){
+                      sigy[i] = 0.16*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+                      sigz[i] = 0.12*x[i];
+                  }
+                  else if(sc=="rc"){
+                      sigy[i] = 0.11*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+                      sigz[i] = 0.08*x[i]*Math.pow((1+0.0002*x[i]), -0.5);
+                  }
+                  else if(sc=="rd"){
+                      sigy[i] = 0.08*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+                      sigz[i] = 0.06*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
+                  }
+                  else if(sc=="re"){
+                      sigy[i] = 0.06*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+                      sigz[i] = 0.03*x[i]*Math.pow((1+0.0003*x[i]), -1);
+                  }
+                  else if(sc=="rf"){
+                      sigy[i] = 0.04*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+                      sigz[i] = 0.016*x[i]*Math.pow((1+0.0003*x[i]), -1);
+                  }
+                  else if(sc=="ua"||"ub"){
+                      sigy[i] = 0.32*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+                      sigz[i] = 0.24*x[i]*Math.pow((1+0.001*x[i]), -0.5);
+                  }
+                  else if(sc=="uc"){
+                      sigy[i] = 0.22*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+                      sigz[i] = 0.20*x[i];
+                  }
+                  else if(sc=="ud"){
+                      sigy[i] = 0.16*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+                      sigz[i] = 0.14*x[i]*Math.pow((1+0.003*x[i]), -0.5);
+                  }
+                  else if(sc=="ue"||"uf"){
+                      sigy[i] = 0.11*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+                      sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
+                  }
+           
+                  sigyn[i] = -sigy[i];
 
-           while(isNaN(y5[i])==false){
-                var c = i+1;
-                ynew1 = y5.slice(0,c);
-                ynew2 = yn.slice(0,c);
-                ynew = ynew1.concat(yn);
-                //  if (isNaN(ynew[i])){
-                //    ynew[i] = ynew[i-1];
-                //  }
-                //  // console.log(ccen);
-                break;    //////////////////////////////WHATS UP WITH THISSSS??????
+                   ccen[i] = (Q*Math.pow(10, 3))*24.45/(3.1416*sigy[i]*sigz[i]*ws*mw); //ppm
+                   //console.log(ccen[i])
+                   y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
+                   //console.log(y5[i]);
+                   yn[i] = sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5)
+                   // console.log(y5)
+                   // console
+
+               while(isNaN(y5[i])==false){
+                    var c = i+1;
+                    ynew1 = y5.slice(0,c);
+                    ynew2 = yn.slice(0,c);
+                    ynew = ynew1.concat(yn);
+                    //  if (isNaN(ynew[i])){
+                    //    ynew[i] = ynew[i-1];
+                    //  }
+                    //  // console.log(ccen);
+                    break;    //////////////////////////////WHATS UP WITH THISSSS??????
+                }
             }
-
         }
 
         for (i in ynew1){
@@ -445,7 +373,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
             //console.log(xx)
             yy[i] = ynew[i] - yoffset_mtrs;
             //console.log(yy)
-            angle[i] = rotation_angle_degs/ RADIANS;
+            angle[i] = wd / RADIANS;//rotation_angle_degs/ RADIANS;
             r[i] = sqrt(xx[i] * xx[i] + yy[i] * yy[i]);
             //console.log(r[i])
             ct[i] = xx[i] / r[i];
@@ -461,7 +389,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
             plat[i] = olat + yyy[i] / d2rlat[i];
             xx1[i] = x[i] - xoffset_mtrs;
             yy1[i] = ynew2[i] - yoffset_mtrs;
-            angle1[i] = rotation_angle_degs/ RADIANS;
+            angle1[i] = wd / RADIANS; //rotation_angle_degs/ RADIANS;
             r1[i] = sqrt(xx1[i] * xx1[i] + yy1[i] * yy1[i]);
             ct1[i] = xx1[i] / r1[i];
             st1[i] = yy1[i] / r1[i];
@@ -485,7 +413,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
         lonn = lng0.reverse()//.reverse();
   
         var cityCircle = new google.maps.Circle({
-            strokeColor: '#FEFB35',
+            strokeColor: strokeColor,
             strokeOpacity: 0.2,
              // strokeWeight: 2,
               //fillColor: '#FF0000',
@@ -555,5 +483,62 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
 };
 
 
+$( document ).ready(function() {
+    console.log( "ready!" );
 
+    // Update from user input changes
+    $("#ws").on('change', function(){
+        ws = $(this).val();
+        drawNewMap();
+    });
+
+    $("#Q").on('change', function(){
+        Q = $(this).val();
+        drawNewMap();
+    });
+
+    $("#wd").on('change', function(){
+        wd = $(this).val();
+        drawNewMap();
+    });
+
+    $("#h").on('change', function(){
+        h = $(this).val();
+        drawNewMap();
+    });
+
+    $("#xRange").on('change', function(){
+        Xmax = $(this).val();
+        drawNewMap();
+    });
+
+    $("#lat").on('change', function(){
+        latitude = parseFloat($(this).val());
+        map.setCenter({lat: latitude, lng: longitude});
+        drawNewMap();
+    });
+
+    $("#lon").on('change', function(){
+        longitude = parseFloat($(this).val());
+        map.setCenter({lat: latitude, lng: longitude});
+        drawNewMap();
+    });
+
+    $("#sclass").on('change', function(){
+        var cl = $(this).val();
+        var sloc = $("#sloc").val();
+        sc = sloc+cl;
+        console.log(sc);
+        drawNewMap();
+    });
+
+    $("#sloc").on('change', function(){
+        var sloc = $(this).val();
+        var cl = $("#sclass").val();
+        sc = sloc+cl;
+        console.log(sc);
+        drawNewMap();
+    });
+
+});
 
