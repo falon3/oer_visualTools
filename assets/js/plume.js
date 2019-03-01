@@ -22,7 +22,7 @@ var defaults = {
   "mw": 17,
   "sc": "rd",
   "lat": 53.5253, // Edmonton, Alberta U of A
-  "lon": -113.525704,
+  "lon": -113.5257,
   "h": 50,
   "Xmax": 10000,
   "Z1": 10,
