@@ -58,6 +58,7 @@ var Z1 = defaults["Z1"];
 var Vs = defaults["Vs"];
 var ds = defaults["ds"];
 var Ts = defaults["Ts"];
+var Ta = defaults["Ta"];
 var Pa = defaults["Pa"];
 // setup map
 var map;
@@ -113,6 +114,18 @@ function calculateUs(){
     return Us
 };
 
+//  deltaH is the Plume Rise in meters
+//  "Vs": vertical stack gas velocity (m/sec)
+//  "ds": inside diameter of stack (m)
+//  "Ts": temp of exhaust gas stream at stack outlet (K)
+//  "Ta": temp of the atmosphere at stack outlet (K)
+//  "Pa": atmospheric pressure at ground level (mb)
+function calculateDeltaH(Us){
+    var deltaH = ((Vs*ds)/Us)*(1.5+ 0.00268*Pa*ds*((Ts-Ta)/Ts));
+    console.log("deltah", deltaH);
+    return deltaH
+}
+
 function drawNewMap(){
     //keep old zoom
     if (map) {
@@ -135,15 +148,18 @@ function initMap() {
     //setTimeout(initMap,10000)
     //var a = Math.floor(Math.random() * 180);
     var Us = calculateUs();
+    var deltaH = calculateDeltaH(Us);
+    var H = h + deltaH;
+    console.log("H", H);
     // cdes5  what is this 30, 160, 1100?????
-    translate_coordinates('#FEFB35', 'Yellow', 30, Us); //yellow
-    translate_coordinates('#FC6215', 'Orange', 160, Us);
-    translate_coordinates('#FF0000', 'Red', 1100, Us); //1100
+    translate_coordinates('#FEFB35', 'Yellow', 30, Us, H); //yellow
+    translate_coordinates('#FC6215', 'Orange', 160, Us, H);
+    translate_coordinates('#FF0000', 'Red', 1100, Us, H); //1100
 }
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function translate_coordinates(strokeColor, ring_color, ppm_region, Us) {
+function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
     with (Math) {
                  // var xx, yy, r, ct, st, angle;
         var RADIANS =57.2957795;
@@ -152,6 +168,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us) {
         var xnew =[];
         var ynew = [];
         var yn = [];
+        var z = H; // this is for topview
         var sigyn =[];
         var xoffset_mtrs = 0;
         var yoffset_mtrs = 0;
@@ -376,12 +393,18 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us) {
                   }
            
                   //sigyn[i] = -sigy[i];
-
-                   ccen[i] = (Q*Math.pow(10, 3))*24.45/(3.1416*sigy[i]*sigz[i]*Us*mw); //ppm
+                  ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw);
+                   //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
                    //console.log(ccen[i])
+
                    y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
+                   /// can't solve for y at same time as C for that y.... need to set C == to value and take one's below it?
+                   // use inequality
+                   // if (sigz[i] < (H/2.15)){
+                   //      y5[i] = sigy[i]*Math.pow((2*log(ccen[i]-Math.pow(((z-H)/sigz[i]),2))), 0.5);
+                   //  }    
                    //console.log(y5[i]);
-                   yn[i] = -y5[i]  //sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
+                   yn[i] = -y5[i]  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    // console.log(y5)
                    // console
 
@@ -462,6 +485,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us) {
         var maxRect = Math.max(r[i])/1000;
         // lat = lattt[i];
         // lng = lonnn[i];
+        //var testdata = [];
         for (i in lattt){
             lat = lattt[i];
             lng = lonnn[i];
@@ -471,7 +495,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us) {
              // console.log(lng);
 
         }
-
         // This example creates a simple polygon representing the Bermuda Triangle.
         // When the user clicks on the polygon an info window opens, showing
         // information about the polygon's coordinates 
