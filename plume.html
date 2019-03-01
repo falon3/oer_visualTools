@@ -28,27 +28,31 @@
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
        #container{
-			height:100%;
+			height: 100%;
+      
 		}
       #map {
       	float: left;
         height: 100%;
         width: 70%;
         box-sizing: border-box;
-		padding: 10px;
+		    padding: 10px;
       }
       #data{
       	float:right;
       	width:30%;
       	height: 100%;
+        overflow: auto;
       	box-sizing: border-box;
-		padding: 10px;
+		    padding: 10px;
+        background-color: #f1efdc;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
         height: 100%;
         margin: 0;
         padding: 0;
+        background-color: #f1efdc;
       }
       .userdata{
             margin-bottom: 10px;
@@ -69,10 +73,17 @@
        <br>
        <input class="userdata" id ="Q" value=25000>
        <br><br>
-       <label>ws: Wind Speed (mph)</label>
+       <label>ws: Wind Speed from Meteorological Tower (m/s)</label>
        <br>
        <input class="userdata" id ="ws" value=5>
        <br>
+       <label>Z1: Height of Tower (m)</label>
+       <br>
+       <input class="userdata" id ="Z1" value=10>
+       <br>
+       <label>Pa: Atmospheric Pressure at Ground Level (mb)</label>
+       <br>
+       <input class="userdata" id ="Pa" value=1032>
        <br>
        <label>wd: Wind Direction</label>
        <br>
@@ -90,26 +101,29 @@
         <br>
        <label>h: Physical Height of Stack (m)</label>
        <br>
-       <input class="userdata" id ="h" value="10">
-       <br><br>
-       <label>X: Max distance X from stack (km)</label>
+       <input class="userdata" id ="h" value="50">
+       <br>
+       <label>ds: Inside Diameter of Stack (m)</label>
+       <br>
+       <input class="userdata" id ="ds" value="2">
+       <br>
+       <label>Vs: Vertical Stack Gas Velocity (m/sec)</label>
+       <br>
+       <input class="userdata" id ="Vs" value="20">
+       <br>
+       <label>Ts: Temp of Exhaust Gas Stream at Stack Outlet (K)</label>
+       <br>
+       <input class="userdata" id ="Ts" value="400">
+       <br>
+       <label>Ta: Temp of Atmosphere at Stack Outlet (K)</label>
+       <br>
+       <input class="userdata" id ="Ta" value="283">
+       <br>
+       <br>
+       <label>X: Max distance X from stack (m)</label>
        <br><br>
        <input class="userdata" type="range"  id="xRange" value="10000" min="0" max="10000" oninput="xOutputId.value = xRange.value">
    <output style="color: darkblue; font-weight: bold; font-size: x-large;" id="xOutputId">10000</output>
-
-
-       <!-- <input class="userdata" type="range"  id="Xmax" value="10000" min="0" max="10000" oninput="XoutputId.value = Xmax.value">
-        <output  style="color: darkblue; font-weight: bold; font-size: x-large;" name="Xoutput" id="XoutputId">10000</output> -->
-        <br>
-        <br>
-       <label>Map Location of Stack</label>
-       <br>
-       <label style="margin-rihgt:5px; font-weight: normal;">Latitude:</label>
-       <input class="userdata"  id="lat" value="53.5253">
-       <br>
-       <label style="margin-rihgt:5px; font-weight: normal;">Longitude:</label>
-       <input class="userdata"  id="lon" value="-113.525704">
-       <br>
        <br>
        <label>sc: Stability Class</label>
        <br>
@@ -125,7 +139,15 @@
           <option value="r">Rural</option>
           <option value="u">Urban</option>
         </select>
-
+        <br>
+        <br>
+       <label>Map Location of Stack</label>
+       <br>
+       <label style="margin-rihgt:5px; font-weight: normal;">Latitude:</label>
+       <input class="userdata"  id="lat" value="53.5253">
+       <br>
+       <label style="margin-rihgt:5px; font-weight: normal;">Longitude:</label>
+       <input class="userdata"  id="lon" value="-113.525704">
       </div>
 
 	</div>

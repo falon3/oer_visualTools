@@ -1,37 +1,38 @@
 
 ///  CODE ADAPTED FROM https://github.com/touhid55/GaussianPlume
 
-// "wd" is wind direction, 
-//     "ws" is wind speed, [Uref]
+//      "wd" is wind direction, 
+//     "ws" is wind speed from meteorological tower, [Uref]
 //     "Q" is amount of material released, [source strength of contaminant I, μg/s]
 //     "mw" is molecular weight, 
 //     "sc" is stability class and 
 //     "lat","lon" are latitude and longitude respectively.
-
-/* NEED USER PROVIDED: 
-h (physical height of the stack in meters)
-y and z and a range for x
-Q is user provided
-sc stability class (rural or urban A,B,C,D,E,F)
-lat/lon coordinates or a translator from city selection or can be selected by clicking or something (later)
-
-*/
-
-var defaults = 
-{
+//      "h" is physical height of the stack
+//      Xmax is the max range of distance from plume to assess
+//      Z1 is height of meteorological tower
+//      "Vs" is vertical stack gas velocity (m/sec)
+//      "ds": inside diameter of stack (m)
+//      "Ts": temp of exhaust gas stream at stack outlet (K)
+//      "Ta": temp of the atmosphere at stack outlet (K)
+//      "Pa": atmospheric pressure at ground level (mb)
+var defaults = {
   "wd": 90, // it's wd-90 
   "ws":5,
   "Q": 25000,
   "mw": 17,
   "sc": "rd",
-  "lat": 53.5253,
+  "lat": 53.5253, // Edmonton, Alberta U of A
   "lon": -113.525704,
-  "h": 10,
-  "Xmax": 10000
-};
-// This example creates a simple polygon representing the Bermuda Triangle.
-// When the user clicks on the polygon an info window opens, showing
-// information about the polygon's coordinates        
+  "h": 50,
+  "Xmax": 10000,
+  "Z1": 10,
+  "Vs": 20,
+  "ds": 2,
+  "Ts": 400,
+  "Ta": 283,
+  "Pa": 1032
+};       
+// API key from https://github.com/touhid55/GaussianPlume
 var config = {
   apiKey: "AIzaSyBuqgAHTym57lDY8g6e8Xuf80E2s8mw-9A",
   authDomain: "gauss-54e5b.firebaseapp.com",
@@ -40,7 +41,6 @@ var config = {
   storageBucket: "gauss-54e5b.appspot.com",
   messagingSenderId: "1039094609006"
 };
-
 
 //SETUP Globals
 firebase.initializeApp(config);
@@ -54,20 +54,41 @@ var latitude = defaults["lat"];
 var longitude = defaults["lon"];
 var h = defaults["h"];
 var Xmax = defaults["Xmax"];
+var Z1 = defaults["Z1"];
+var Vs = defaults["Vs"];
+var ds = defaults["ds"];
+var Ts = defaults["Ts"];
+var Pa = defaults["Pa"];
+// setup map
 var map;
 var zoom = 12;
 var center= {lat: latitude, lng: longitude};
 var infoWindow;
 
+// P is function of atmospheric stability (A to F) 
+// and surface roughness (urban vs rural (also called open country) environment
+var P = {
+    "ua": 0.15,
+    "ub": 0.15,
+    "uc": 0.20,
+    "ud": 0.25,
+    "ue": 0.30,
+    "uf": 0.30,
+    "ra": 0.07,
+    "rb": 0.07,
+    "rc": 0.10,
+    "rd": 0.15,
+    "re": 0.35,
+    "rf": 0.55
+}
 
-
+// CAN REFACTOR THIS INTO A GET CURRENT WEATHER ROUTINE AND OPTION FOR USER LATER
 d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.8249187", function(data) {
 
     // console.log(data.iss_position.latitude);
     var cws = JSON.stringify(data.windspeed);
     cws = cws.match(/\d/g);
     cws = cws.join("");
-    console.log(cws)
 
 
     // THIS DOESNT LOOK RIGHT FOR GETTING WIND DIRECTION?? HARDCODED
@@ -78,9 +99,19 @@ d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.824918
 
     if (cwd===undefined){
       cwd=1;
-      console.log(cwd)
     }
 });  
+
+// Us is wind speed at height h (at stack opening)
+// h is stack height
+// Z1 is height of meteorological tower
+// P is function of atmospheric stability
+// ws is wind speed from measured tower
+function calculateUs(){
+    var Us = ws*(Math.pow((h/Z1),P[sc]));
+    console.log("USSSSS", Us);
+    return Us
+};
 
 function drawNewMap(){
     //keep old zoom
@@ -102,17 +133,17 @@ function drawNewMap(){
 
 function initMap() {
     //setTimeout(initMap,10000)
-    var a = Math.floor(Math.random() * 180);
-         // var max;
+    //var a = Math.floor(Math.random() * 180);
+    var Us = calculateUs();
     // cdes5  what is this 30, 160, 1100?????
-    translate_coordinates('#FEFB35', 'Yellow', 30); //yellow
-    translate_coordinates('#FC6215', 'Orange', 160);
-    translate_coordinates('#FF0000', 'Red', 1100); //1100
+    translate_coordinates('#FEFB35', 'Yellow', 30, Us); //yellow
+    translate_coordinates('#FC6215', 'Orange', 160, Us);
+    translate_coordinates('#FF0000', 'Red', 1100, Us); //1100
 }
 
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function translate_coordinates(strokeColor, ring_color, ppm_region) {
+function translate_coordinates(strokeColor, ring_color, ppm_region, Us) {
     with (Math) {
                  // var xx, yy, r, ct, st, angle;
         var RADIANS =57.2957795;
@@ -344,13 +375,13 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
                       sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
                   }
            
-                  sigyn[i] = -sigy[i];
+                  //sigyn[i] = -sigy[i];
 
-                   ccen[i] = (Q*Math.pow(10, 3))*24.45/(3.1416*sigy[i]*sigz[i]*ws*mw); //ppm
+                   ccen[i] = (Q*Math.pow(10, 3))*24.45/(3.1416*sigy[i]*sigz[i]*Us*mw); //ppm
                    //console.log(ccen[i])
                    y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    //console.log(y5[i]);
-                   yn[i] = sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5)
+                   yn[i] = -y5[i]  //sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    // console.log(y5)
                    // console
 
@@ -422,15 +453,12 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
             center: {lat:latitude, lng: longitude},
             radius:Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
         });
-        console.log(cityCircle.radius);
-        console.log(Math.max(r[i]));
         //lng = lng.reverse();
         cityCircle.addListener('click', showNewRect)
         //for (i in lat){
         lattt = latt.concat(lat1);
         lonnn = lonn.concat(lng1);
         //lng.concat(lng);
-        console.log(Math.max(r[i]));
         var maxRect = Math.max(r[i])/1000;
         // lat = lattt[i];
         // lng = lonnn[i];
@@ -444,6 +472,9 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
 
         }
 
+        // This example creates a simple polygon representing the Bermuda Triangle.
+        // When the user clicks on the polygon an info window opens, showing
+        // information about the polygon's coordinates 
         var bermudaTriangle = new google.maps.Polygon({
 
             paths: triangleCoords,
@@ -460,7 +491,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
             // get lat/lon of click
             var clickLat = event.latLng.lat();
             var clickLon = event.latLng.lng();
-            console.log(clickLat)
             // show in input box
         });
 
@@ -485,58 +515,73 @@ function translate_coordinates(strokeColor, ring_color, ppm_region) {
 
 $( document ).ready(function() {
     console.log( "ready!" );
-
     // Update from user input changes
     $("#ws").on('change', function(){
-        ws = $(this).val();
+        ws = parseInt($(this).val());
         drawNewMap();
     });
-
     $("#Q").on('change', function(){
-        Q = $(this).val();
+        Q = parseInt((this).val());
         drawNewMap();
     });
-
     $("#wd").on('change', function(){
         wd = $(this).val();
         drawNewMap();
     });
-
     $("#h").on('change', function(){
-        h = $(this).val();
+        h = parseInt($(this).val());
         drawNewMap();
     });
-
     $("#xRange").on('change', function(){
         Xmax = $(this).val();
         drawNewMap();
     });
-
     $("#lat").on('change', function(){
         latitude = parseFloat($(this).val());
         map.setCenter({lat: latitude, lng: longitude});
         drawNewMap();
     });
-
     $("#lon").on('change', function(){
         longitude = parseFloat($(this).val());
         map.setCenter({lat: latitude, lng: longitude});
         drawNewMap();
     });
-
     $("#sclass").on('change', function(){
         var cl = $(this).val();
         var sloc = $("#sloc").val();
         sc = sloc+cl;
-        console.log(sc);
+        //console.log(sc);
         drawNewMap();
     });
-
     $("#sloc").on('change', function(){
         var sloc = $(this).val();
         var cl = $("#sclass").val();
         sc = sloc+cl;
-        console.log(sc);
+        //console.log(sc);
+        drawNewMap();
+    });
+    $("#Z1").on('change', function(){
+        Z1 = $(this).val();
+        drawNewMap();
+    });
+    $("#Vs").on('change', function(){
+        Vs = $(this).val();
+        drawNewMap();
+    });
+    $("#ds").on('change', function(){
+        ds = $(this).val();
+        drawNewMap();
+    });
+    $("#Ts").on('change', function(){
+        Ts = $(this).val();
+        drawNewMap();
+    });
+    $("#Ta").on('change', function(){
+        Ta = $(this).val();
+        drawNewMap();
+    });
+    $("#Pa").on('change', function(){
+        Pa = $(this).val();
         drawNewMap();
     });
 
