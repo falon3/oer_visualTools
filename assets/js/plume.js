@@ -18,7 +18,7 @@
 var defaults = {
   "wd": 90, // it's wd-90 
   "ws":5,
-  "Q": 25000,
+  "Q": 25000000,
   "mw": 17,
   "sc": "rd",
   "lat": 53.5253, // Edmonton, Alberta U of A
@@ -110,7 +110,6 @@ d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.824918
 // ws is wind speed from measured tower
 function calculateUs(){
     var Us = ws*(Math.pow((h/Z1),P[sc]));
-    console.log("USSSSS", Us);
     return Us
 };
 
@@ -122,7 +121,6 @@ function calculateUs(){
 //  "Pa": atmospheric pressure at ground level (mb)
 function calculateDeltaH(Us){
     var deltaH = ((Vs*ds)/Us)*(1.5+ 0.00268*Pa*ds*((Ts-Ta)/Ts));
-    console.log("deltah", deltaH);
     return deltaH
 }
 
@@ -150,11 +148,11 @@ function initMap() {
     var Us = calculateUs();
     var deltaH = calculateDeltaH(Us);
     var H = h + deltaH;
-    console.log("H", H);
-    // cdes5  what is this 30, 160, 1100?????
-    translate_coordinates('#FEFB35', 'Yellow', 30, Us, H); //yellow
-    translate_coordinates('#FC6215', 'Orange', 160, Us, H);
-    translate_coordinates('#FF0000', 'Red', 1100, Us, H); //1100
+    // cdes5 30, 160, 1100
+    // color of triangle, word to display, area with so much μg/m^3 concentration for each section
+    translate_coordinates('#FEFB35', 'Yellow', 5, Us, H); //yellow
+    translate_coordinates('#FC6215', 'Orange', 10, Us, H);
+    translate_coordinates('#FF0000', 'Red', 50, Us, H); //1100
 }
 
 
@@ -209,7 +207,12 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         var triangleCoords1 = [];
         var all = {};
     //x = [10, 100, 1000, 5000, 10000];
-        x = [];
+        x = [0.0000005, 100];
+        var k = 1;
+        while (x[k] < Xmax-100){
+             x.push(x[k]+100);
+             k=k+1;
+        }
 
         var sigy =[];
         var sigy1 =[];
@@ -233,114 +236,8 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         var lonn =[];
         var lat0 =[];
         var lng0 = [];
-    // count = 0.005;
-
-        x = [
-        0.0000005,
-        100,
-        200,
-        300,
-        400,
-        500,
-        600,
-        700,
-        800,
-        900,
-        1000,
-        1100,
-        1200,
-        1300,
-        1400,
-        1500,
-        1600,
-        1700,
-        1800,
-        1900,
-        2000,
-        2100,
-        2200,
-        2300,
-        2400,
-        2500,
-        2600,
-        2700,
-        2800,
-        2900,
-        3000,
-        3100,
-        3200,
-        3300,
-        3400,
-        3500,
-        3600,
-        3700,
-        3800,
-        3900,
-        4000,
-        4100,
-        4200,
-        4300,
-        4400,
-        4500,
-        4600,
-        4700,
-        4800,
-        4900,
-        5000,
-        5100,
-        5200,
-        5300,
-        5400,
-        5500,
-        5600,
-        5700,
-        5800,
-        5900,
-        6000,
-        6100,
-        6200,
-        6300,
-        6400,
-        6500,
-        6600,
-        6700,
-        6800,
-        6900,
-        7000,
-        7100,
-        7200,
-        7300,
-        7400,
-        7500,
-        7600,
-        7700,
-        7800,
-        7900,
-        8000,
-        8100,
-        8200,
-        8300,
-        8400,
-        8500,
-        8600,
-        8700,
-        8800,
-        8900,
-        9000,
-        9100,
-        9200,
-        9300,
-        9400,
-        9500,
-        9600,
-        9700,
-        9800,
-        9900,
-        10000
-        ];
         
         for (i in x){
-            if (i <= Xmax) {
                 //rotation_angle_degs = rotation_angle_degs;
                 xoffset_mtrs[i] = xoffset_mtrs;
                 yoffset_mtrs[i] = yoffset_mtrs;
@@ -391,23 +288,28 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
                       sigy[i] = 0.11*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
                       sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
                   }
-           
-                  //sigyn[i] = -sigy[i];
-                  ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw);
-                   //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
+                  //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
+                    ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
                    //console.log(ccen[i])
 
-                   y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
-                   /// can't solve for y at same time as C for that y.... need to set C == to value and take one's below it?
-                   // use inequality
-                   // if (sigz[i] < (H/2.15)){
-                   //      y5[i] = sigy[i]*Math.pow((2*log(ccen[i]-Math.pow(((z-H)/sigz[i]),2))), 0.5);
-                   //  }    
-                   //console.log(y5[i]);
+                   //y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5); //old simpler formula
+                   //find the Y that yields this C(x,y,z)==cdes5(max concentration for this region) and make that the bounding arcline
+                   if (sigz[i] < (H/2.15)){
+                        y5[i] = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
+                    }
+                    else{ //after plume hits the ground)   
+                         y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)*(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))+0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
+                   }
                    yn[i] = -y5[i]  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
-                   // console.log(y5)
-                   // console
 
+                // for (i=0; i++; i<y5.length){
+                //     if (isNaN(y5[i])==false){
+                //         var c = i+1;
+                //         ynew1 = y5.slice(0,c);
+                //         ynew2 = yn.slice(0,c);
+                //         ynew = ynew1.concat(yn);
+                //     }
+                // }
                while(isNaN(y5[i])==false){
                     var c = i+1;
                     ynew1 = y5.slice(0,c);
@@ -419,9 +321,8 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
                     //  // console.log(ccen);
                     break;    //////////////////////////////WHATS UP WITH THISSSS??????
                 }
-            }
         }
-
+        
         for (i in ynew1){
             xx[i] = x[i] - xoffset_mtrs;
             //console.log(xx)
@@ -495,6 +396,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
              // console.log(lng);
 
         }
+        //console.log(triangleCoords);
         // This example creates a simple polygon representing the Bermuda Triangle.
         // When the user clicks on the polygon an info window opens, showing
         // information about the polygon's coordinates 
@@ -510,6 +412,8 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
         });
 
+
+
          bermudaTriangle.addListener('click', function(event) {
             // get lat/lon of click
             var clickLat = event.latLng.lat();
@@ -522,11 +426,11 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
             var infoWindow = new google.maps.InfoWindow();
             var contentString = 'Math.max(r[i])';
-            if(maxRect< 10){
-              infoWindow.setContent( ring_color+' Threat Zone-LOC:AEGL-1(60 min):30ppm'+'</br>'+'Maximum Downwind Distance='+maxRect.toFixed(2)+'km');
-          }else{
-              infoWindow.setContent(ring_color+ ' Threat Zone-LOC:AEGL-1(60 min):30ppm'+'</br>'+'Maximum Downwind Distance='+'More than 10'+'km');
-          }
+            //if(maxRect< Xmax/1000){
+              infoWindow.setContent( ring_color+' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+maxRect.toFixed(2)+'km');
+          //}else{
+              //infoWindow.setContent(ring_color+ ' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+'More than '+ (Xmax/1000).toString()+' km');
+          //}
           infoWindow.setPosition(latLng);
           infoWindow.open(map);
         } 
@@ -544,7 +448,7 @@ $( document ).ready(function() {
         drawNewMap();
     });
     $("#Q").on('change', function(){
-        Q = parseInt((this).val());
+        Q = parseInt($(this).val());
         drawNewMap();
     });
     $("#wd").on('change', function(){
