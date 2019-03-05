@@ -20,7 +20,7 @@ var defaults = {
   "ws":5,
   "Q": 25000000,
   "mw": 17,
-  "sc": "rd",
+  "sc": "ud",
   "lat": 53.5253, // Edmonton, Alberta U of A
   "lon": -113.5257,
   "h": 50,
@@ -151,7 +151,7 @@ function initMap() {
     // cdes5 30, 160, 1100
     // color of triangle, word to display, area with so much μg/m^3 concentration for each section
     translate_coordinates('#FEFB35', 'Yellow', 5, Us, H); //yellow
-    translate_coordinates('#FC6215', 'Orange', 10, Us, H);
+    translate_coordinates('#FC6215', 'Orange', 20, Us, H);
     translate_coordinates('#FF0000', 'Red', 50, Us, H); //1100
 }
 
@@ -317,7 +317,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
                    if (abs(sigz[i]-(H/2.15))<0.5){
                             bounce_y.push(y5[i], -y5[i]);
-                            console.log("BOUNCE",bounce_y);
                         }
                    yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    
@@ -344,7 +343,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
 
         ///NOT SURE HOW THIS CONVERSION WORKS REALLY, LEFT AS IS.
-        console.log(ynew1);
         for (i in ynew1){
             xx[i] = x[i] - xoffset_mtrs;
             //console.log(xx)
@@ -382,7 +380,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
 
             if (bounce_y.indexOf(ynew[i]) != -1){
-                console.log("ADDEDD");
                 blat0[i] =plat[i];
                 blng0[i] = plon[i];
                 blat1[i]=plat1[i]
@@ -458,7 +455,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
              //console.log(triangleCoords[i]);
              // console.log(lng);
         }
-        console.log("BCOOOOOOORDDDSSS",bounceCoords);
         //console.log(triangleCoords);
         // This example creates a simple polygon representing the Bermuda Triangle.
         // When the user clicks on the polygon an info window opens, showing
