@@ -164,7 +164,6 @@ function initMap() {
     translate_coordinates('#FF0000', 'Red', red_zone, Us, H); //1100
 }
 
-
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
     with (Math) {
