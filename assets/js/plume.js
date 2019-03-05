@@ -15,6 +15,15 @@
 //      "Ts": temp of exhaust gas stream at stack outlet (K)
 //      "Ta": temp of the atmosphere at stack outlet (K)
 //      "Pa": atmospheric pressure at ground level (mb)
+
+
+// COLOR CODES FOR REGIONS
+//each colored area with so much μg/m^3 concentration
+var yellow_zone = 5; //μg/m^3
+var orange_zone = 20; //μg/m^3
+var red_zone = 50; //μg/m^3
+
+
 var defaults = {
   "wd": 90, // it's wd-90 
   "ws":5,
@@ -150,9 +159,9 @@ function initMap() {
     var H = h + deltaH;
     // cdes5 30, 160, 1100
     // color of triangle, word to display, area with so much μg/m^3 concentration for each section
-    translate_coordinates('#FEFB35', 'Yellow', 5, Us, H); //yellow
-    translate_coordinates('#FC6215', 'Orange', 20, Us, H);
-    translate_coordinates('#FF0000', 'Red', 50, Us, H); //1100
+    translate_coordinates('#FEFB35', 'Yellow', yellow_zone, Us, H); //yellow
+    translate_coordinates('#FC6215', 'Orange', orange_zone, Us, H);
+    translate_coordinates('#FF0000', 'Red', red_zone, Us, H); //1100
 }
 
 
@@ -171,7 +180,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         var xoffset_mtrs = 0;
         var yoffset_mtrs = 0;
         
-
         var lat = [];
         var lng = [];
         xx = [];
@@ -315,34 +323,23 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
                         
                    }
 
+                   // keep track of the line where the plume hits ground
                    if (abs(sigz[i]-(H/2.15))<0.5){
                             bounce_y.push(y5[i], -y5[i]);
                         }
                    yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    
-                // for (i=0; i++; i<y5.length){
-                //     if (isNaN(y5[i])==false){
-                //         var c = i+1;
-                //         ynew1 = y5.slice(0,c);
-                //         ynew2 = yn.slice(0,c);
-                //         ynew = ynew1.concat(yn);
-                //     }
-                // }
                while(isNaN(y5[i])==false){
                     var c = i+1;
                     ynew1 = y5.slice(0,c);
                     ynew2 = yn.slice(0,c);
                     ynew = ynew1.concat(yn);
-                    //  if (isNaN(ynew[i])){
-                    //    ynew[i] = ynew[i-1];
-                    //  }
-                    //  // console.log(ccen);
-                    break;    //////////////////////////////WHATS UP WITH THISSSS??????
+                    break;   
                 }
         }
 
 
-        ///NOT SURE HOW THIS CONVERSION WORKS REALLY, LEFT AS IS.
+        ///NOT SURE HOW THIS non-concise CONVERSION WORKS entirely, LEFT AS IS.
         for (i in ynew1){
             xx[i] = x[i] - xoffset_mtrs;
             //console.log(xx)
@@ -373,8 +370,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
             d2rlat1[i] = olat/RADIANS;
             d2rlon1[i] = (111415.13 * cos(d2rlat1[i])) - (94.55 * cos(3.0 * d2rlat1[i])) + (0.12 * cos(5.0 * d2rlat1[i]));
             d2rlat1[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat1[i])) + (1.20 * cos(4.0 * d2rlat1[i])) - (0.002 * cos(6.0 * d2rlat1[i])));
-            //console.log(d2rlat);
-            // console.log(d2rlon);
+
             plon1[i] = olon + xxx1[i] / d2rlon1[i];
             plat1[i] = olat + yyy1[i] / d2rlat1[i];
 
@@ -401,20 +397,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         blattt = blatt.concat(blat1);
         blonnn = blonn.concat(blng1);
 
-
-        // var bounceCircle = new google.maps.Circle({
-        //     strokeColor: '#050519',
-        //     strokeOpacity: 0.2,
-        //      // strokeWeight: 2,
-        //       //fillColor: '#FF0000',
-        //     fillOpacity: 0,
-        //     map: map,
-        //     center: {lat:latitude, lng: longitude},
-        //     radius: bounceLine//sqrt(bounceLine[0]*bounceLine[0] + bounceLine[1]*bounceLine[1])//Math.sqrt(citymap[city].population) * 100
-        // });
-        //  bounceCircle.addListener('click', explainLine);
-
-
         var cityCircle = new google.maps.Circle({
             strokeColor: strokeColor,
             strokeOpacity: 0.2,
@@ -428,32 +410,19 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         //lng = lng.reverse();
         cityCircle.addListener('click', showNewRect);
 
-
-
-        //for (i in lat){
-        
-        //lng.concat(lng);
         var maxRect = Math.max(r[i])/1000;
-        // lat = lattt[i];
-        // lng = lonnn[i];
-        //var testdata = [];
         for (i in lattt){
             lat = lattt[i];
             lng = lonnn[i];
             latLng = {lat,lng};
              triangleCoords.push(latLng)//[i]=[{lat,lng}];
-             //console.log(triangleCoords[i]);
-             // console.log(lng);
-
         }
 
         for (i in blattt){
             lat = blattt[i];
             lng = blonnn[i];
             latLng = {lat,lng};
-            bounceCoords.push(latLng)//[i]=[{lat,lng}];
-             //console.log(triangleCoords[i]);
-             // console.log(lng);
+            bounceCoords.push(latLng)
         }
         //console.log(triangleCoords);
         // This example creates a simple polygon representing the Bermuda Triangle.
@@ -483,23 +452,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
         });
 
-
-
-        //  bermudaTriangle.addListener('click', function(event) {
-        //     // get lat/lon of click
-        //     var clickLat = event.latLng.lat();
-        //     var clickLon = event.latLng.lng();
-        //     // show in input box
-        // });
-
-        //  function explainLine(event){
-        //     var infwindow = new google.maps.InfoWindow();
-        //     infwindow.setContent("Black ring is where the Plume hits the ground");
-        //     infwindow.setPosition(latLng);
-        //     infwindow.open(map);  
-
-        // }
-
+        // not used but may later for changing color codes for regions
         function addHexColor(c1, c2) {
             if (c1[0]=='#') c1=c1.slice(1);
             if (c2[0]=='#') c2=c2.slice(2);
@@ -509,8 +462,6 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         }
 
          function showNewRect(event){
-
-
             var infoWindow = new google.maps.InfoWindow();
             var contentString = 'Math.max(r[i])';
             if(maxRect< Xmax/1000){
