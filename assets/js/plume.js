@@ -19,15 +19,20 @@
 
 // COLOR CODES FOR REGIONS
 //each colored area with so much μg/m^3 concentration
-var yellow_zone = 5; //μg/m^3
-var orange_zone = 20; //μg/m^3
-var red_zone = 50; //μg/m^3
-
+// level in μg/m^3
+var polution_levels = {
+    0: {color: '#9FFF33', level: 5},
+    1: {color: '#fbe37f', level: 10},
+    2: {color: '#ffcd00', level: 20},
+    3: {color: '#fb740c', level: 30},
+    4: {color: '#f32a2a', level: 50},
+    5: {color: '#5d0404', level: 100}
+}
 
 var defaults = {
   "wd": 90, // it's wd-90 
-  "ws":5,
-  "Q": 25000000,
+  "ws":4,
+  "Q": 250000000,
   "mw": 17,
   "sc": "ud",
   "lat": 53.5253, // Edmonton, Alberta U of A
@@ -159,13 +164,13 @@ function initMap() {
     var H = h + deltaH;
     // cdes5 30, 160, 1100
     // color of triangle, word to display, area with so much μg/m^3 concentration for each section
-    translate_coordinates('#FEFB35', 'Yellow', yellow_zone, Us, H); //yellow
-    translate_coordinates('#FC6215', 'Orange', orange_zone, Us, H);
-    translate_coordinates('#FF0000', 'Red', red_zone, Us, H); //1100
+    for (l in Object.keys(polution_levels)){
+        translate_coordinates(polution_levels[l]['color'], polution_levels[l]['level'], Us, H); //yellow
+    }
 }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
+function translate_coordinates(strokeColor, zone, Us, H) {
     with (Math) {
                  // var xx, yy, r, ct, st, angle;
         var RADIANS =57.2957795;
@@ -218,10 +223,10 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
         var all = {};
     //x = [10, 100, 1000, 5000, 10000];
-        x = [0.0000005, 50];
+        x = [0, 20];
         var k = 1;
-        while (x[k] < Xmax-10){
-             x.push(x[k]+2);
+        while (x[k] < Xmax-5){
+             x.push(x[k]+1);
              k=k+1;
         }
 
@@ -231,7 +236,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         var sigz1 =[];
         var ccen =[];
         var ccen1 =[];
-        var cdes5 = ppm_region;//160; //ppm
+        var cdes5 = zone;//160; //ppm
         var y5 = [];
         var y51 = [];
         var ynew1 =[];
@@ -434,7 +439,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
             strokeOpacity: 0.8,
             strokeWeight: 3,
             fillColor: strokeColor,
-            fillOpacity: 0.35,
+            fillOpacity: 0.5,
             someRandomData: "I'm a custom tooltip :-)"
 
         });
@@ -446,7 +451,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
             strokeOpacity: 0.8,
             strokeWeight: 3,
             fillColor: '#080808',
-            fillOpacity: 0.35,
+            fillOpacity: 0.2,
             someRandomData: "I'm a custom tooltip :-)"
 
         });
@@ -464,9 +469,9 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
             var infoWindow = new google.maps.InfoWindow();
             var contentString = 'Math.max(r[i])';
             if(maxRect< Xmax/1000){
-              infoWindow.setContent( ring_color+' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+maxRect.toFixed(2)+'km');
+              infoWindow.setContent( 'Threat Zone: '+zone.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+maxRect.toFixed(2)+'km');
           }else{
-              infoWindow.setContent(ring_color+ ' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+'More than '+ (Xmax/1000).toString()+' km');
+              infoWindow.setContent(' Threat Zone: '+zone.toString()+ ' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+'More than '+ (Xmax/1000).toString()+' km');
           }
           infoWindow.setPosition(latLng);
           infoWindow.open(map);

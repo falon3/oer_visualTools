@@ -32,9 +32,11 @@
       
 		}
       #map {
-      	float: left;
+      	position: absolute;
         height: 100%;
         width: 70%;
+        top:0;
+        left:0;
         box-sizing: border-box;
 		    padding: 10px;
       }
@@ -59,6 +61,49 @@
       label{
         font-weight: bold;
       }
+      .my-legend .legend-title {
+        text-align: center;
+        margin-bottom: 8px;
+        font-weight: bold;
+        font-size: 90%;
+        }
+      .my-legend .legend-scale ul {
+        margin: 0;
+        padding: 0;
+        float: left;
+        list-style: none;
+        }
+      .my-legend .legend-scale ul li {
+        display: block;
+        float: left;
+        width: 50px;
+        margin-bottom: 6px;
+        text-align: center;
+        font-size: 80%;
+        list-style: none;
+        }
+      .my-legend ul.legend-labels li span {
+        display: block;
+        float: left;
+        height: 15px;
+        width: 50px;
+        }
+      .my-legend .legend-source {
+        font-size: 70%;
+        color: #999;
+        clear: both;
+        }
+      .my-legend a {
+        color: #777;
+        
+        }
+        .my-legend {
+          position: absolute;
+          top: 60px;
+          left: 10px;
+          z-index: 10;
+          background-color: white;
+        }
     </style>
 
   </head>
@@ -66,15 +111,29 @@
   <body>
 
 	<div id="container">
-    	<div id="map"></div>
+    <div id="map"></div>
+      <div class='my-legend'>
+        <div class='legend-title'> Concentration of Contaminate (μg/m^3)</div>
+      <div class='legend-scale'>
+        <ul class='legend-labels'>
+          <li><span style='background:#9FFF33;'></span>5 - 10 μg/m^3</li>
+          <li><span style='background:#fbe37f;'></span>10 - 20 μg/m^3</li>
+          <li><span style='background:#ffcd00;'></span>20 - 30 μg/m^3</li>
+          <li><span style='background:#fb740c;'></span>30 - 50 μg/m^3</li>
+          <li><span style='background:#f32a2a;'></span>50 - 100 μg/m^3</li>
+          <li><span style='background:#5d0404;'></span>100+ μg/m^3</li>
+        </ul>
+      </div>
+      </div>
+      
     	<div id="data">
        <label>Q: Source strength of contaminant (μg/s)</label>
        <br>
-       <input type=number class="userdata" id ="Q" value=25000000>
+       <input type=number class="userdata" id ="Q" value=250000000>
        <br><br>
        <label>ws: Wind Speed from Meteorological Tower (m/s)</label>
        <br>
-       <input type=number class="userdata" id ="ws" value=5>
+       <input type=number class="userdata" id ="ws" value=4>
        <br>
        <label>Z1: Height of Tower (m)</label>
        <br>
