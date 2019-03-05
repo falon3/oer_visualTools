@@ -62,7 +62,7 @@ var Ta = defaults["Ta"];
 var Pa = defaults["Pa"];
 // setup map
 var map;
-var zoom = 12;
+var zoom = 14;
 var center= {lat: latitude, lng: longitude};
 var infoWindow;
 
@@ -170,6 +170,7 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         var sigyn =[];
         var xoffset_mtrs = 0;
         var yoffset_mtrs = 0;
+        
 
         var lat = [];
         var lng = [];
@@ -205,12 +206,15 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         RADIANS = 57.2957795;
         var triangleCoords = [];
         var triangleCoords1 = [];
+        var bounceCoords = [];
+        var bounce_y = [];
+
         var all = {};
     //x = [10, 100, 1000, 5000, 10000];
-        x = [0.0000005, 100];
+        x = [0.0000005, 50];
         var k = 1;
-        while (x[k] < Xmax-100){
-             x.push(x[k]+100);
+        while (x[k] < Xmax-10){
+             x.push(x[k]+2);
              k=k+1;
         }
 
@@ -236,6 +240,14 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
         var lonn =[];
         var lat0 =[];
         var lng0 = [];
+        var blat0 = [];
+        var blng0 = [];
+        var blat1 = [];
+        var blng1= [];
+        var blatt = [];
+        var blonn = [];
+        var blattt = [];
+        var blonnn = [];
         
         for (i in x){
                 //rotation_angle_degs = rotation_angle_degs;
@@ -294,14 +306,21 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
                    //y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5); //old simpler formula
                    //find the Y that yields this C(x,y,z)==cdes5(max concentration for this region) and make that the bounding arcline
-                   if (sigz[i] < (H/2.15)){
+                   if (sigz[i]<(H/2.15)){
                         y5[i] = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
+                        
                     }
-                    else{ //after plume hits the ground)   
+                    else { //after plume hits the ground)   
                          y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)*(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))+0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
+                        
                    }
-                   yn[i] = -y5[i]  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
 
+                   if (abs(sigz[i]-(H/2.15))<0.5){
+                            bounce_y.push(y5[i], -y5[i]);
+                            console.log("BOUNCE",bounce_y);
+                        }
+                   yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
+                   
                 // for (i=0; i++; i<y5.length){
                 //     if (isNaN(y5[i])==false){
                 //         var c = i+1;
@@ -322,7 +341,10 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
                     break;    //////////////////////////////WHATS UP WITH THISSSS??????
                 }
         }
-        
+
+
+        ///NOT SURE HOW THIS CONVERSION WORKS REALLY, LEFT AS IS.
+        console.log(ynew1);
         for (i in ynew1){
             xx[i] = x[i] - xoffset_mtrs;
             //console.log(xx)
@@ -358,15 +380,44 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
             plon1[i] = olon + xxx1[i] / d2rlon1[i];
             plat1[i] = olat + yyy1[i] / d2rlat1[i];
 
+
+            if (bounce_y.indexOf(ynew[i]) != -1){
+                console.log("ADDEDD");
+                blat0[i] =plat[i];
+                blng0[i] = plon[i];
+                blat1[i]=plat1[i]
+                blng1[i] = plon1[i]
+            }
             lat0[i] =plat[i];
             lng0[i] = plon[i];
             lat1[i]=plat1[i]
-            lng1[i] = plon1[i]
+            lng1[i] = plon1[i]  
         };
 
         latt = lat0.reverse();
         lonn = lng0.reverse()//.reverse();
-  
+        lattt = latt.concat(lat1);
+        lonnn = lonn.concat(lng1);
+
+        blatt = blat0.reverse();
+        blonn = blng0.reverse()//.reverse();
+        blattt = blatt.concat(blat1);
+        blonnn = blonn.concat(blng1);
+
+
+        // var bounceCircle = new google.maps.Circle({
+        //     strokeColor: '#050519',
+        //     strokeOpacity: 0.2,
+        //      // strokeWeight: 2,
+        //       //fillColor: '#FF0000',
+        //     fillOpacity: 0,
+        //     map: map,
+        //     center: {lat:latitude, lng: longitude},
+        //     radius: bounceLine//sqrt(bounceLine[0]*bounceLine[0] + bounceLine[1]*bounceLine[1])//Math.sqrt(citymap[city].population) * 100
+        // });
+        //  bounceCircle.addListener('click', explainLine);
+
+
         var cityCircle = new google.maps.Circle({
             strokeColor: strokeColor,
             strokeOpacity: 0.2,
@@ -378,10 +429,12 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
             radius:Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
         });
         //lng = lng.reverse();
-        cityCircle.addListener('click', showNewRect)
+        cityCircle.addListener('click', showNewRect);
+
+
+
         //for (i in lat){
-        lattt = latt.concat(lat1);
-        lonnn = lonn.concat(lng1);
+        
         //lng.concat(lng);
         var maxRect = Math.max(r[i])/1000;
         // lat = lattt[i];
@@ -396,6 +449,16 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
              // console.log(lng);
 
         }
+
+        for (i in blattt){
+            lat = blattt[i];
+            lng = blonnn[i];
+            latLng = {lat,lng};
+            bounceCoords.push(latLng)//[i]=[{lat,lng}];
+             //console.log(triangleCoords[i]);
+             // console.log(lng);
+        }
+        console.log("BCOOOOOOORDDDSSS",bounceCoords);
         //console.log(triangleCoords);
         // This example creates a simple polygon representing the Bermuda Triangle.
         // When the user clicks on the polygon an info window opens, showing
@@ -412,30 +475,59 @@ function translate_coordinates(strokeColor, ring_color, ppm_region, Us, H) {
 
         });
 
+        var bounceTriangle = new google.maps.Polygon({
 
+            paths: bounceCoords,
+            strokeColor: '#080808',
+            strokeOpacity: 0.8,
+            strokeWeight: 3,
+            fillColor: '#080808',
+            fillOpacity: 0.35,
+            someRandomData: "I'm a custom tooltip :-)"
 
-         bermudaTriangle.addListener('click', function(event) {
-            // get lat/lon of click
-            var clickLat = event.latLng.lat();
-            var clickLon = event.latLng.lng();
-            // show in input box
         });
+
+
+
+        //  bermudaTriangle.addListener('click', function(event) {
+        //     // get lat/lon of click
+        //     var clickLat = event.latLng.lat();
+        //     var clickLon = event.latLng.lng();
+        //     // show in input box
+        // });
+
+        //  function explainLine(event){
+        //     var infwindow = new google.maps.InfoWindow();
+        //     infwindow.setContent("Black ring is where the Plume hits the ground");
+        //     infwindow.setPosition(latLng);
+        //     infwindow.open(map);  
+
+        // }
+
+        function addHexColor(c1, c2) {
+            if (c1[0]=='#') c1=c1.slice(1);
+            if (c2[0]=='#') c2=c2.slice(2);
+            var hexStr = (parseInt(c1, 16) + parseInt(c2, 16)).toString(16);
+            while (hexStr.length < 6) { hexStr = '0' + hexStr; } // Zero pad.
+            return '#'+hexStr;
+        }
 
          function showNewRect(event){
 
 
             var infoWindow = new google.maps.InfoWindow();
             var contentString = 'Math.max(r[i])';
-            //if(maxRect< Xmax/1000){
+            if(maxRect< Xmax/1000){
               infoWindow.setContent( ring_color+' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+maxRect.toFixed(2)+'km');
-          //}else{
-              //infoWindow.setContent(ring_color+ ' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+'More than '+ (Xmax/1000).toString()+' km');
-          //}
+          }else{
+              infoWindow.setContent(ring_color+ ' Threat Zone-LOC:AEGL-1(60 min):'+ppm_region.toString()+' μg/m' + "3".sup()+'</br>'+'Maximum Downwind Distance='+'More than '+ (Xmax/1000).toString()+' km');
+          }
           infoWindow.setPosition(latLng);
           infoWindow.open(map);
         } 
 
         bermudaTriangle.setMap(map);
+        bounceTriangle.setMap(map);
     }
 };
 
