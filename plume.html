@@ -19,7 +19,7 @@
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAGXaF9n_XgHUHMaTn0wiP9yDqVB5S0SrA&callback=drawNewMap">
     
     </script>
-
+    <link rel="stylesheet" href="assets/css/jquery-ui.min.css">
     
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
@@ -34,7 +34,7 @@
       #map {
       	position: absolute;
         height: 100%;
-        width: 70%;
+        width: 65%;
         top:0;
         left:0;
         box-sizing: border-box;
@@ -42,7 +42,7 @@
       }
       #data{
       	float:right;
-      	width:30%;
+      	width:35%;
       	height: 100%;
         overflow: auto;
       	box-sizing: border-box;
@@ -55,6 +55,11 @@
         padding: 0;
 
       }
+      .sliderout{
+        font-weight: bold; 
+        font-size:large;
+      }
+
       .userdata{
             margin-bottom: 10px;
       }
@@ -127,24 +132,19 @@
       </div>
       
     	<div id="data">
-       <label>Q: Source strength of contaminant (μg/s)</label>
-       <br>
-       <input type=number class="userdata" id ="Q" value=250000000>
-       <br><br>
-       <label>ws: Wind Speed from Meteorological Tower (m/s)</label>
-       <br>
-       <input type=number class="userdata" id ="ws" value=4>
-       <br>
-       <label>Z1: Height of Tower (m)</label>
-       <br>
-       <input type=number class="userdata" id ="Z1" value=10>
-       <br>
-       <label>Pa: Atmospheric Pressure at Ground Level (mb)</label>
-       <br>
-       <input type=number class="userdata" id ="Pa" value=1032>
-       <br>
-       <label>wd: Wind Direction</label>
-       <br>
+       <label>Q: Source strength of Contaminant = <output class="sliderout" id="QOut"></output> μg/s</label><br>
+       <input class="userdata" type="range"  id="QRange" min="1000000" max="500000000" oninput="QOut.value = QRange.value"><br>
+
+       <label>ws: Wind Speed from Meteorological Tower = <output class="sliderout" id="wsOut"></output> m/s</label><br>
+       <input class="userdata" type="range"  id="wsRange"  min="0" max="60" oninput="wsOut.value = wsRange.value"><br>   
+
+       <label>Z1: Height of Tower = <output class="sliderout" id="Z1Out"></output> m</label><br>
+       <input class="userdata" type="range"  id="Z1Oange"  min="0" max="60" oninput="Z1Out.value = Z1Range.value"><br>
+       
+       <label>Pa: Atmospheric Pressure at Ground Level = <output class="sliderout" id="PaOut"></output> mb</label><br> 
+       <input class="userdata" type="range"  id="PaRange"  min="300" max="4000" oninput="PaOut.value = PaRange.value"><br>
+       
+       <label>wd: Wind Direction</label><br>
        <select id="wd">
           <option value=90>South</option>
           <option value=45>SouthEast</option>
@@ -157,34 +157,25 @@
         </select>
         <br>
         <br>
-       <label>h: Physical Height of Stack (m)</label>
-       <br>
-       <input type=number class="userdata" id ="h" value="50">
-       <br>
-       <label>ds: Inside Diameter of Stack (m)</label>
-       <br>
-       <input type=number class="userdata" id ="ds" value="2">
-       <br>
-       <label>Vs: Vertical Stack Gas Velocity (m/sec)</label>
-       <br>
-       <input type=number class="userdata" id ="Vs" value="20">
-       <br>
-       <label>Ts: Temp of Exhaust Gas Stream at Stack Outlet (K)</label>
-       <br>
-       <input type=number class="userdata" id ="Ts" value="400">
-       <br>
-       <label>Ta: Temp of Atmosphere at Stack Outlet (K)</label>
-       <br>
-       <input class="userdata" id ="Ta" value="283">
-       <br>
-       <br>
-       <label>X: Max distance X from stack (m)</label>
-       <br><br>
-       <input class="userdata" type="range"  id="xRange" value="10000" min="100" max="20000" oninput="xOutputId.value = xRange.value">
-   <output style="color: darkblue; font-weight: bold; font-size: x-large;" id="xOutputId">10000</output>
-       <br>
-       <label>sc: Stability Class</label>
-       <br>
+       <label>h: Physical Height of Stack = <output class="sliderout" id="hOut"></output> m</label><br>
+       <input class="userdata" type="range"  id="hRange" min="1" max="200" oninput="hOut.value = hRange.value"><br>
+       
+       <label>ds: Inside Diameter of Stack = <output class="sliderout" id="dsOut"></output> m</label><br>      
+       <input class="userdata" type="range"  id="dsRange" min="1" max="10" oninput="dsOut.value = dsRange.value"><br>
+
+       <label>Vs: Vertical Stack Gas Velocity = <output class="sliderout" id="VsOut"></output> m/sec</label><br>
+       <input class="userdata" type="range"  id="VsRange" min="1" max="50" oninput="VsOut.value = VsRange.value"><br>
+      
+       <label>Ts: Temp of Exhaust Gas Stream at Stack Outlet = <output class="sliderout" id="TsOut"></output> K</label><br>
+       <input class="userdata" type="range"  id="TsRange" min="200" max="500" oninput="TsOut.value = TsRange.value"><br>
+      
+       <label>Ta: Temp of Atmosphere at Stack Outlet = <output class="sliderout" id="TaOut"></output> K</label><br>
+       <input class="userdata" type="range"  id="TaRange" min="200" max="500" oninput="TaOut.value = TaRange.value"><br>
+
+       <label>X: Max distance X from stack = <output class="sliderout" id="XmaxOut"></output> m</label><br>  
+       <input class="userdata" type="range"  id="XmaxRange" min="100" max="20000" oninput="XmaxOut.value = XmaxRange.value"><br>
+       
+       <label>sc: Stability Class</label><br>
        <select id="sclass">
           <option value="d">D</option>
           <option value="a">A</option>

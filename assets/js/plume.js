@@ -16,6 +16,25 @@
 //      "Ta": temp of the atmosphere at stack outlet (K)
 //      "Pa": atmospheric pressure at ground level (mb)
 
+var defaults = {
+  "wd": 90, // it's wd-90 
+  "ws":4,
+  "Q": 250000000,
+  //"mw": 17,
+  "sc": "ud",
+  "lat": 53.5253, // Edmonton, Alberta U of A
+  "lon": -113.5257,
+  "h": 50,
+  "Xmax": 10000,
+  "Z1": 10,
+  "Vs": 20,
+  "ds": 2,
+  "Ts": 400,
+  "Ta": 283,
+  "Pa": 1032
+};       
+// all values that have slider changeable values
+var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
 
 // COLOR CODES FOR REGIONS
 //each colored area with so much μg/m^3 concentration
@@ -29,23 +48,6 @@ var polution_levels = {
     5: {color: '#5d0404', level: 100}
 }
 
-var defaults = {
-  "wd": 90, // it's wd-90 
-  "ws":4,
-  "Q": 250000000,
-  "mw": 17,
-  "sc": "ud",
-  "lat": 53.5253, // Edmonton, Alberta U of A
-  "lon": -113.5257,
-  "h": 50,
-  "Xmax": 10000,
-  "Z1": 10,
-  "Vs": 20,
-  "ds": 2,
-  "Ts": 400,
-  "Ta": 283,
-  "Pa": 1032
-};       
 // API key from https://github.com/touhid55/GaussianPlume
 var config = {
   apiKey: "AIzaSyBuqgAHTym57lDY8g6e8Xuf80E2s8mw-9A",
@@ -99,13 +101,10 @@ var P = {
 
 // CAN REFACTOR THIS INTO A GET CURRENT WEATHER ROUTINE AND OPTION FOR USER LATER
 d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.8249187", function(data) {
-
     // console.log(data.iss_position.latitude);
     var cws = JSON.stringify(data.windspeed);
     cws = cws.match(/\d/g);
     cws = cws.join("");
-
-
     // THIS DOESNT LOOK RIGHT FOR GETTING WIND DIRECTION?? HARDCODED
     var cwd = JSON.stringify(data.winddisplay);
     // var myString = cwd;
@@ -152,7 +151,6 @@ function drawNewMap(){
       labels:true
   });
     initMap();
-
 }
 
 
@@ -162,7 +160,6 @@ function initMap() {
     var Us = calculateUs();
     var deltaH = calculateDeltaH(Us);
     var H = h + deltaH;
-    // cdes5 30, 160, 1100
     // color of triangle, word to display, area with so much μg/m^3 concentration for each section
     for (l in Object.keys(polution_levels)){
         translate_coordinates(polution_levels[l]['color'], polution_levels[l]['level'], Us, H); //yellow
@@ -323,8 +320,11 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                         
                     }
                     else { //after plume hits the ground)   
-                         y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)*(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))+0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
-                        
+                         y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
+                                                         *(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))
+                                                                      +0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
+                        // y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
+                        //                                  *(1/Math.exp((Math.pow(z,2)+Math.pow(H,2))/Math.pow(sigz[i],2)))))); 
                    }
 
                    // keep track of the line where the plume hits ground
@@ -403,7 +403,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
 
         var cityCircle = new google.maps.Circle({
             strokeColor: strokeColor,
-            strokeOpacity: 0.2,
+            strokeOpacity: 0.3,
              // strokeWeight: 2,
               //fillColor: '#FF0000',
             fillOpacity: 0,
@@ -482,28 +482,61 @@ function translate_coordinates(strokeColor, zone, Us, H) {
     }
 };
 
+//set and display defaults for sliders
+function setSliderValues(sliders){
+    for (i in sliders){
+        $("#"+sliders[i]+"Range").val(defaults[sliders[i]]);
+        $("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
+    }
+}
 
 $( document ).ready(function() {
+
+    setSliderValues(all_sliders);
     console.log( "ready!" );
     // Update from user input changes
-    $("#ws").on('change', function(){
+    $("#wsRange").on('change', function(){
         ws = parseInt($(this).val());
         drawNewMap();
     });
-    $("#Q").on('change', function(){
+    $("#QRange").on('change', function(){
         Q = parseInt($(this).val());
         drawNewMap();
     });
-    $("#wd").on('change', function(){
-        wd = $(this).val();
-        drawNewMap();
-    });
-    $("#h").on('change', function(){
+    $("#hRange").on('change', function(){
         h = parseInt($(this).val());
         drawNewMap();
     });
     $("#xRange").on('change', function(){
         Xmax = $(this).val();
+        drawNewMap();
+    });
+    $("#Z1Range").on('change', function(){
+        Z1 = $(this).val();
+        drawNewMap();
+    });
+    $("#VsRange").on('change', function(){
+        Vs = $(this).val();
+        drawNewMap();
+    });
+    $("#dsRange").on('change', function(){
+        ds = $(this).val();
+        drawNewMap();
+    });
+    $("#TsRange").on('change', function(){
+        Ts = $(this).val();
+        drawNewMap();
+    });
+    $("#TaRange").on('change', function(){
+        Ta = $(this).val();
+        drawNewMap();
+    });
+    $("#PaRange").on('change', function(){
+        Pa = $(this).val();
+        drawNewMap();
+    });
+    $("#wd").on('change', function(){
+        wd = $(this).val();
         drawNewMap();
     });
     $("#lat").on('change', function(){
@@ -528,30 +561,6 @@ $( document ).ready(function() {
         var cl = $("#sclass").val();
         sc = sloc+cl;
         //console.log(sc);
-        drawNewMap();
-    });
-    $("#Z1").on('change', function(){
-        Z1 = $(this).val();
-        drawNewMap();
-    });
-    $("#Vs").on('change', function(){
-        Vs = $(this).val();
-        drawNewMap();
-    });
-    $("#ds").on('change', function(){
-        ds = $(this).val();
-        drawNewMap();
-    });
-    $("#Ts").on('change', function(){
-        Ts = $(this).val();
-        drawNewMap();
-    });
-    $("#Ta").on('change', function(){
-        Ta = $(this).val();
-        drawNewMap();
-    });
-    $("#Pa").on('change', function(){
-        Pa = $(this).val();
         drawNewMap();
     });
 
