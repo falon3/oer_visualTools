@@ -109,6 +109,10 @@
           z-index: 10;
           background-color: white;
         }
+        /*override their color scheme for bar on legend*/
+        .ui-widget-header {
+          background-color: #908b8b;
+      }
     </style>
 
   </head>
@@ -134,7 +138,7 @@
           <input type="text" id="amount" readonly style="font-size:medium; border:0; color: #2c2d2c; font-weight:bold;">
         </p>
          
-        <div id="slider-range"></div>
+        <div style = "margin-bottom:5px;" id="slider-range"></div>
       </div>
       
     	<div id="data">
