@@ -39,15 +39,15 @@ var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
 // COLOR CODES FOR REGIONS
 //each colored area with so much μg/m^3 concentration
 // level in μg/m^3
-var polution_max = 100;
-var polution_min = 5;
+// var polution_max = 100;
+// var polution_min = 5;
 var polution_levels = {
-    0: {color: '#9FFF33', level: polution_min},
-    1: {color: '#fbe37f', level: 10},
-    2: {color: '#ffcd00', level: 20},
-    3: {color: '#fb740c', level: 30},
-    4: {color: '#f32a2a', level: 50},
-    5: {color: '#5d0404', level: polution_max}
+    0: {color: '#9FFF33', level: 5},
+    1: {color: '#fbe37f', level: 20},
+    2: {color: '#ffcd00', level: 35},
+    3: {color: '#fb740c', level: 50},
+    4: {color: '#f32a2a', level: 65},
+    5: {color: '#5d0404', level: 100}
 }
 
 // API key from https://github.com/touhid55/GaussianPlume
@@ -153,13 +153,19 @@ function drawNewMap(){
       mapTypeId: 'satellite',
       labels:true
   });
+    updateLegend();
     initMap();
 }
 
+function updateLegend(){
+    for (i in Object.keys(polution_levels)){
+        $("#level"+i.toString()).html(polution_levels[i]["level"]+"+");
+    } 
+}
 
 function initMap() {
     //setTimeout(initMap,10000)
-    //var a = Math.floor(Math.random() * 180);
+    //var a = Math.floor(Math.random() * 180);   
     var Us = calculateUs();
     var deltaH = calculateDeltaH(Us);
     var H = h + deltaH;
@@ -176,7 +182,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         olon = longitude;
         rotation_angle_degs = wd;
         var ynew = [];
-        var z = H+10; // this is for topview
+        var z = H; // this is for topview
         var xoffset = 0;
         var yoffset = 0;
         var last = 0;
@@ -187,10 +193,10 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var bounce_y = [];
 
     //x = [10, 100, 1000, 5000, 10000];
-        x = [0, 5];
+        x = [0, 2];
         var k = 1;
         while (x[k] < Xmax-5){
-             x.push(x[k]+5);
+             x.push(x[k]+2);
              k=k+1;
         }
         var sigy =[];
@@ -207,66 +213,69 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var blng0 = [];
         var blat1 = [];
         var blng1= [];
-        
+        var lattt = [];
+        var lonnn = [];
+        var blattt = [];
+        var blonnn =[];
 
 
         //OLLLDDDDDDDDDDDD?????????????????????.///////////////
 
-        var lat = [];
-        var lng = [];
-        var blattt = [];
-        var blonnn = [];
-        var lattt = [];
-        var lonnn = [];
-        xx = [];
-        xx1 =[];
-        yy = [];
-        yy1 = [];
-        r1 =[];
-        ct = [];
-        ct1 =[];
-        st = [];
-        st1 =[];
-        xxx = [];
-        xxx1 = [];
-        yyy = [];
-        yyy1 = [];
-        d2rlon = [];
-        d2rlat1 = [];
-        d2rlat = [];
-        d2rlon1 =[];
-        plon = [];
-        plon1 =[];
-        plat = [];
-        plat1 = [];
-        angle =[0];
-        angle1 =[0];
-        var u = 5;
-        var all = {};
-        var sigy =[];
-        var sigy1 =[];
-        var sigz =[];
-        var sigz1 =[];
-        var ccen =[];
-        var ccen1 =[];
-        var cdes5 = zone;//160; //ppm
-        var y5 = [];
-        var y51 = [];
-        var ynew1 =[];
-        var latLng1 = [];
-        var lattt = [];
-        var lonnn =[];
-        var latLng = {};
-        var lat2 =[];
-        var lng2 = [];
-        var latt = [];
-        var lonn =[];
-        var lat0 =[];
-        var lng0 = [];
-        var blatt = [];
-        var blonn = [];
-        var blattt = [];
-        var blonnn = [];
+        // var lat = [];
+        // var lng = [];
+        // var blattt = [];
+        // var blonnn = [];
+        // var lattt = [];
+        // var lonnn = [];
+        // xx = [];
+        // xx1 =[];
+        // yy = [];
+        // yy1 = [];
+        // r1 =[];
+        // ct = [];
+        // ct1 =[];
+        // st = [];
+        // st1 =[];
+        // xxx = [];
+        // xxx1 = [];
+        // yyy = [];
+        // yyy1 = [];
+        // d2rlon = [];
+        // d2rlat1 = [];
+        // d2rlat = [];
+        // d2rlon1 =[];
+        // plon = [];
+        // plon1 =[];
+        // plat = [];
+        // plat1 = [];
+        // angle =[0];
+        // angle1 =[0];
+        // var u = 5;
+        // var all = {};
+        // var sigy =[];
+        // var sigy1 =[];
+        // var sigz =[];
+        // var sigz1 =[];
+        // var ccen =[];
+        // var ccen1 =[];
+        // var cdes5 = zone;//160; //ppm
+        // var y5 = [];
+        // var y51 = [];
+        // var ynew1 =[];
+        // var latLng1 = [];
+        // var lattt = [];
+        // var lonnn =[];
+        // var latLng = {};
+        // var lat2 =[];
+        // var lng2 = [];
+        // var latt = [];
+        // var lonn =[];
+        // var lat0 =[];
+        // var lng0 = [];
+        // var blatt = [];
+        // var blonn = [];
+        // var blattt = [];
+        // var blonnn = [];
 
 
         // if (t2)
@@ -322,26 +331,12 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                    //y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5); //old simpler formula
                    //find the Y that yields this C(x,y,z)==cdes5(max concentration for this region) and make that the bounding arcline
                    if (sigz[i]<(H/2.15)){
-                        var this_y  = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
-                        //if (this_y>last){
-                            y5[i] = this_y;
-                        // }
-                        // else{
-                        //     y5[i]=NaN;
-                        // }
+                        y5[i]  = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
                     }
                     else { //after plume hits the ground)   
-                         var this_y = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
+                         y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
                                                          *(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))
                                                                       +0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
-                        //if (this_y>last){
-                            y5[i] = this_y;
-                        // }
-                        // else{
-                        //     y5[i]=NaN;
-                        // }
-                        // y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
-                        //                                  *(1/Math.exp((Math.pow(z,2)+Math.pow(H,2))/Math.pow(sigz[i],2)))))); 
                    } 
                    if (isNaN(y5[i])==false){
                         last = y5[i];
@@ -349,7 +344,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                    
                    // keep track of the line where the plume hits ground
                    if (abs(sigz[i]-(H))<0.5){
-                            bounce_y.push(y5[i], -y5[i]);
+                            bounce_y.push(x[i]);
                         }
                    //yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    
@@ -375,17 +370,18 @@ function translate_coordinates(strokeColor, zone, Us, H) {
             lng1[i]=coords_left.lng;
             r[i] = sqrt(xx*xx + yy*yy);
 
-            if (bounce_y.indexOf(ynew[i]) != -1){
+            if (bounce_y.indexOf(x[i]) != -1){
                 blat0[i] =lat0[i];
                 blng0[i] = lng0[i];
                 blat1[i]=lat1[i];
                 blng1[i] = lng1[i];
             }
         }
-        var lattt = lat0.reverse().concat(lat1);
-        var lonnn = lng0.reverse().concat(lng1);
-        var blattt = blat0.reverse().concat(blat1);
-        var blonnn = blng0.reverse().concat(blng1);
+        
+        lattt = lat0.reverse().concat(lat1);
+        lonnn = lng0.reverse().concat(lng1);
+        blattt = blat0.reverse().concat(blat1);
+        blonnn = blng0.reverse().concat(blng1);
 
         ////////////NEWWWWWWWWWWWWWWWWWWWWW///////////////////
 
@@ -475,7 +471,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
             lat = lattt[i];
             lng = lonnn[i];
             latLng = {lat,lng};
-             triangleCoords.push(latLng)//[i]=[{lat,lng}];
+            triangleCoords.push(latLng)//[i]=[{lat,lng}];
         }
 
         for (i in blattt){
@@ -488,7 +484,6 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         // This example creates a simple polygon representing the Bermuda Triangle.
         // When the user clicks on the polygon an info window opens, showing
         // information about the polygon's coordinates 
-        console.log(triangleCoords);
         var bermudaTriangle = new google.maps.Polygon({
 
             paths: triangleCoords,
@@ -561,7 +556,7 @@ function METERS_DEGLAT(x)
    }
 }
 
-// #   translate_coordinates
+// #   xy_to_latlon
 // #   routine to translate between geographic and cartesian coordinates
 // #   user must supply following data on the cartesian coordinate system:
 // #   location of the origin in lat/lon degrees;
@@ -569,11 +564,6 @@ function METERS_DEGLAT(x)
 // #   N.B. sense of rotation i/p here is exactly as o/p by ORIGIN
 // #   x/y offset in meters - only if an offset was used during the
 // #   running of prog ORIGIN;
-// */porg={x:sx,y:sy,coord_system:1,olat:olat,
-//olon:olon,xoffset_mtrs:0,yoffset_mtrs:0,rotation_angle_degs:0,rms_error:0};
-
-//need porg = {x:,y:,rotation_angle_degs:,xoffset,yoffset,}
-//xy_to_latlon(x, y, olon, olat, wd, xoffset, yoffset)
 function xy_to_latlon(x, y, olon, olat, rotation_angle_degs, xoffset, yoffset){
    with(Math)
    {   
@@ -608,6 +598,34 @@ function setSliderValues(sliders){
         $("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
     }
 }
+
+$( function() {
+    $( "#slider-range" ).slider({
+      range: true,
+      min: 2,
+      max: 500,
+      values: [ 5, 100 ],
+      slide: function( event, ui ) {
+        $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] ); 
+        var levels = Object.keys(polution_levels);   
+        var vmin = ui.values[ 0 ];
+        var vmax = ui.values[ 1 ];
+        var multiplier = Math.floor((vmax-vmin)/(levels.length+1));
+        for (var i=0; i<levels.length/2 ;i++){
+             polution_levels[i]['level']=vmin+(i*multiplier);
+        }
+        for (var i=levels.length-1, j=0; i>=levels.length/2; i--){
+             polution_levels[i]['level']=vmax-(j*multiplier);
+             j = j+1;
+        }
+        drawNewMap();
+        }
+    });
+    $( "#amount" ).val( $( "#slider-range" ).slider( "values", 0 ) +
+      " - " + $( "#slider-range" ).slider( "values", 1 )); // initially
+  } );
+
+
 
 $( document ).ready(function() {
 
@@ -683,27 +701,17 @@ $( document ).ready(function() {
         drawNewMap();
     });
 
-$( function() {
-    $( "#slider-range" ).slider({
-      range: true,
-      min: 2,
-      max: 500,
-      values: [ 5, 100 ],
-      slide: function( event, ui ) {
-        $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );    
-        polution_min = $( "#slider-range" ).slider( "values", 0 );
-        var multiplier = Math.floor((polution_max-polution_min)/5);
-        for (i in polution_levels){
-            polution_levels[i]['level']=polution_min+(i*multiplier);
-        }
-        polution_max = $( "#slider-range" ).slider( "values", 1 );
-        drawNewMap();
-      }
-    });
-    $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
-      " - $" + $( "#slider-range" ).slider( "values", 1 ) );
-  } );
-
-
+    // $( "#slider-range" ).slider("values").change(function(){
+        // var levels = Object.keys(polution_levels);   
+        // var vmin = $( "#slider-range" ).slider( "values", 0 );
+        // var vmax = $( "#slider-range" ).slider( "values", 1 );
+        // var multiplier = Math.floor((vmax-vmin)/(levels.length-1));
+        // for (var i=0; i<levels.length-1 ;i++){
+        //      polution_levels[i]['level']=vmin+(i*multiplier);
+        // }
+        // console.log($( "#slider-range" ).slider( "values", 1 ));
+        // polution_levels[levels.length-1]['level'] = $( "#slider-range" ).slider( "values", 1 );
+        // drawNewMap();
+    //});
 });
 

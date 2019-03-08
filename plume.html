@@ -121,17 +121,17 @@
         <div class='legend-title'> Concentration of Contaminate (μg/m^3)</div>
       <div class='legend-scale'>
         <ul class='legend-labels'>
-          <li><span  style='background:#9FFF33;'></span>5+ μg/m^3</li>
-          <li><span style='background:#fbe37f;'></span>10+ μg/m^3</li>
-          <li><span style='background:#ffcd00;'></span>20+ μg/m^3</li>
-          <li><span style='background:#fb740c;'></span>30+ μg/m^3</li>
-          <li><span style='background:#f32a2a;'></span>50+ μg/m^3</li>
-          <li><span style='background:#5d0404;'></span>100+ μg/m^3</li>
+          <li><span style='background:#9FFF33;'></span><span id="level0">5+</span> μg/m<sup>3</sup></li>
+          <li><span style='background:#fbe37f;'></span><span id="level1">10+</span> μg/m<sup>3</sup></li>
+          <li><span style='background:#ffcd00;'></span><span id="level2">20+</span> μg/m<sup>3</sup></li>
+          <li><span style='background:#fb740c;'></span><span id="level3">30+</span> μg/m<sup>3</sup></li>
+          <li><span style='background:#f32a2a;'></span><span id="level4">50+</span> μg/m<sup>3</sup></li>
+          <li><span style='background:#5d0404;'></span><span id="level5">100+</span> μg/m<sup>3</sup></li>
         </ul>
       </div>
       <p>
-          <label for="amount">Scale range:</label>
-          <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+          <label for="amount">Contaminant range:</label>
+          <input type="text" id="amount" readonly style="font-size:medium; border:0; color: #2c2d2c; font-weight:bold;">
         </p>
          
         <div id="slider-range"></div>
