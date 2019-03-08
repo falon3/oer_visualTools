@@ -39,13 +39,15 @@ var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
 // COLOR CODES FOR REGIONS
 //each colored area with so much μg/m^3 concentration
 // level in μg/m^3
+var polution_max = 100;
+var polution_min = 5;
 var polution_levels = {
-    0: {color: '#9FFF33', level: 5},
+    0: {color: '#9FFF33', level: polution_min},
     1: {color: '#fbe37f', level: 10},
     2: {color: '#ffcd00', level: 20},
     3: {color: '#fb740c', level: 30},
     4: {color: '#f32a2a', level: 50},
-    5: {color: '#5d0404', level: 100}
+    5: {color: '#5d0404', level: polution_max}
 }
 
 // API key from https://github.com/touhid55/GaussianPlume
@@ -81,6 +83,7 @@ var map;
 var zoom = 14;
 var center= {lat: latitude, lng: longitude};
 var infoWindow;
+var RADIANS =57.2957795;
 
 // P is function of atmospheric stability (A to F) 
 // and surface roughness (urban vs rural (also called open country) environment
@@ -166,28 +169,59 @@ function initMap() {
     }
 }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function translate_coordinates(strokeColor, zone, Us, H) {
     with (Math) {
                  // var xx, yy, r, ct, st, angle;
-        var RADIANS =57.2957795;
-        olat = latitude//23.7866104;
-        olon = longitude//90.3696289;
-        var xnew =[];
+        olat = latitude;
+        olon = longitude;
+        rotation_angle_degs = wd;
         var ynew = [];
-        var yn = [];
-        var z = H; // this is for topview
-        var sigyn =[];
-        var xoffset_mtrs = 0;
-        var yoffset_mtrs = 0;
+        var z = H+10; // this is for topview
+        var xoffset = 0;
+        var yoffset = 0;
+        var last = 0;
+        var r = [];
+        var triangleCoords = [];
+        var triangleCoords1 = [];
+        var bounceCoords = [];
+        var bounce_y = [];
+
+    //x = [10, 100, 1000, 5000, 10000];
+        x = [0, 5];
+        var k = 1;
+        while (x[k] < Xmax-5){
+             x.push(x[k]+5);
+             k=k+1;
+        }
+        var sigy =[];
+        var sigz =[];
+        var ccen =[];
+        var cdes5 = zone;//160; //ppm
+        var y5 = [];
+        var ynew1 =[];
+        var lat1 = [];
+        var lng1 = [];
+        var lat0 =[];
+        var lng0 = [];
+        var blat0 = [];
+        var blng0 = [];
+        var blat1 = [];
+        var blng1= [];
         
+
+
+        //OLLLDDDDDDDDDDDD?????????????????????.///////////////
+
         var lat = [];
         var lng = [];
+        var blattt = [];
+        var blonnn = [];
+        var lattt = [];
+        var lonnn = [];
         xx = [];
         xx1 =[];
         yy = [];
         yy1 = [];
-        r = [];
         r1 =[];
         ct = [];
         ct1 =[];
@@ -207,26 +241,8 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         plat1 = [];
         angle =[0];
         angle1 =[0];
-
-        // if (t2)
-        var u = 5//Math.floor(Math.random() * 20);//m/s 
-    //var u = //Math.floor(Math.random() * 20);//m/s
-    //var Q = mat//10000//Math.floor(Math.random() * 1000);
-        RADIANS = 57.2957795;
-        var triangleCoords = [];
-        var triangleCoords1 = [];
-        var bounceCoords = [];
-        var bounce_y = [];
-
+        var u = 5;
         var all = {};
-    //x = [10, 100, 1000, 5000, 10000];
-        x = [0, 20];
-        var k = 1;
-        while (x[k] < Xmax-5){
-             x.push(x[k]+1);
-             k=k+1;
-        }
-
         var sigy =[];
         var sigy1 =[];
         var sigz =[];
@@ -237,8 +253,6 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var y5 = [];
         var y51 = [];
         var ynew1 =[];
-        var lat1 = [];
-        var lng1 = [];
         var latLng1 = [];
         var lattt = [];
         var lonnn =[];
@@ -249,25 +263,17 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var lonn =[];
         var lat0 =[];
         var lng0 = [];
-        var blat0 = [];
-        var blng0 = [];
-        var blat1 = [];
-        var blng1= [];
         var blatt = [];
         var blonn = [];
         var blattt = [];
         var blonnn = [];
+
+
+        // if (t2)
+        
+        //////END OLD?????????????????///////////////
         
         for (i in x){
-                //rotation_angle_degs = rotation_angle_degs;
-                xoffset_mtrs[i] = xoffset_mtrs;
-                yoffset_mtrs[i] = yoffset_mtrs;
-                //  RADIANS[i] =RADIANS;
-                olat[i] = olat;
-                olon[i]= olon;
-                //d2rlat[i] =d2rlat ;
-                //x[i] = count;
-
                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
                 if (sc=="ra") {
                  sigy[i] = 0.22*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
@@ -316,90 +322,138 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                    //y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5); //old simpler formula
                    //find the Y that yields this C(x,y,z)==cdes5(max concentration for this region) and make that the bounding arcline
                    if (sigz[i]<(H/2.15)){
-                        y5[i] = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
-                        
+                        var this_y  = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
+                        //if (this_y>last){
+                            y5[i] = this_y;
+                        // }
+                        // else{
+                        //     y5[i]=NaN;
+                        // }
                     }
                     else { //after plume hits the ground)   
-                         y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
+                         var this_y = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
                                                          *(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))
                                                                       +0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
+                        //if (this_y>last){
+                            y5[i] = this_y;
+                        // }
+                        // else{
+                        //     y5[i]=NaN;
+                        // }
                         // y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
                         //                                  *(1/Math.exp((Math.pow(z,2)+Math.pow(H,2))/Math.pow(sigz[i],2)))))); 
+                   } 
+                   if (isNaN(y5[i])==false){
+                        last = y5[i];
                    }
-
+                   
                    // keep track of the line where the plume hits ground
-                   if (abs(sigz[i]-(H/2.15))<0.5){
+                   if (abs(sigz[i]-(H))<0.5){
                             bounce_y.push(y5[i], -y5[i]);
                         }
-                   yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
+                   //yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
                    
                while(isNaN(y5[i])==false){
                     var c = i+1;
-                    ynew1 = y5.slice(0,c);
-                    ynew2 = yn.slice(0,c);
-                    ynew = ynew1.concat(yn);
+                    ynew = y5.slice(0,c);
                     break;   
                 }
         }
 
 
-        ///NOT SURE HOW THIS non-concise CONVERSION WORKS entirely, LEFT AS IS.
-        for (i in ynew1){
-            xx[i] = x[i] - xoffset_mtrs;
-            //console.log(xx)
-            yy[i] = ynew[i] - yoffset_mtrs;
-            //console.log(yy)
-            angle[i] = wd / RADIANS;//rotation_angle_degs/ RADIANS;
-            r[i] = sqrt(xx[i] * xx[i] + yy[i] * yy[i]);
-            //console.log(r[i])
-            ct[i] = xx[i] / r[i];
-            st[i] = yy[i] / r[i];
-            xxx[i] = r[i] * ((ct[i] * cos(angle[i])) + (st[i] * sin(angle[i])));
-            yyy[i] = r[i] * ((st[i] * cos(angle[i])) - (ct[i] * sin(angle[i])));
-            d2rlat[i] = olat/RADIANS;
-            d2rlon[i] = (111415.13 * cos(d2rlat[i])) - (94.55 * cos(3.0 * d2rlat[i])) + (0.12 * cos(5.0 * d2rlat[i]));
-            d2rlat[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat[i])) + (1.20 * cos(4.0 * d2rlat[i])) - (0.002 * cos(6.0 * d2rlat[i])));
-            //console.log(d2rlat);
-            // console.log(d2rlon);
-            plon[i] = olon + xxx[i] / d2rlon[i];
-            plat[i] = olat + yyy[i] / d2rlat[i];
-            xx1[i] = x[i] - xoffset_mtrs;
-            yy1[i] = ynew2[i] - yoffset_mtrs;
-            angle1[i] = wd / RADIANS; //rotation_angle_degs/ RADIANS;
-            r1[i] = sqrt(xx1[i] * xx1[i] + yy1[i] * yy1[i]);
-            ct1[i] = xx1[i] / r1[i];
-            st1[i] = yy1[i] / r1[i];
-            xxx1[i] = r1[i] * ((ct1[i] * cos(angle1[i])) + (st1[i] * sin(angle1[i])));
-            yyy1[i] = r1[i] * ((st1[i] * cos(angle1[i])) - (ct1[i] * sin(angle1[i])));
-            d2rlat1[i] = olat/RADIANS;
-            d2rlon1[i] = (111415.13 * cos(d2rlat1[i])) - (94.55 * cos(3.0 * d2rlat1[i])) + (0.12 * cos(5.0 * d2rlat1[i]));
-            d2rlat1[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat1[i])) + (1.20 * cos(4.0 * d2rlat1[i])) - (0.002 * cos(6.0 * d2rlat1[i])));
+        for (i in ynew){
 
-            plon1[i] = olon + xxx1[i] / d2rlon1[i];
-            plat1[i] = olat + yyy1[i] / d2rlat1[i];
-
+            ///////NEWWWWWWWWWWWWWW////////////////////
+            var yy = ynew[i] - yoffset;
+            var y_left = -ynew[i] - yoffset;
+            var xx = x[i] - xoffset;
+            var coords_right = xy_to_latlon(xx, yy, olon, olat, wd, xoffset, yoffset);
+            var coords_left = xy_to_latlon(xx, -yy, olon, olat, wd, xoffset, yoffset);
+            lat0[i]=coords_right.lat;
+            lng0[i]=coords_right.lng;
+            lat1[i]=coords_left.lat;
+            lng1[i]=coords_left.lng;
+            r[i] = sqrt(xx*xx + yy*yy);
 
             if (bounce_y.indexOf(ynew[i]) != -1){
-                blat0[i] =plat[i];
-                blng0[i] = plon[i];
-                blat1[i]=plat1[i]
-                blng1[i] = plon1[i]
+                blat0[i] =lat0[i];
+                blng0[i] = lng0[i];
+                blat1[i]=lat1[i];
+                blng1[i] = lng1[i];
             }
-            lat0[i] =plat[i];
-            lng0[i] = plon[i];
-            lat1[i]=plat1[i]
-            lng1[i] = plon1[i]  
-        };
+        }
+        var lattt = lat0.reverse().concat(lat1);
+        var lonnn = lng0.reverse().concat(lng1);
+        var blattt = blat0.reverse().concat(blat1);
+        var blonnn = blng0.reverse().concat(blng1);
 
-        latt = lat0.reverse();
-        lonn = lng0.reverse()//.reverse();
-        lattt = latt.concat(lat1);
-        lonnn = lonn.concat(lng1);
+        ////////////NEWWWWWWWWWWWWWWWWWWWWW///////////////////
 
-        blatt = blat0.reverse();
-        blonn = blng0.reverse()//.reverse();
-        blattt = blatt.concat(blat1);
-        blonnn = blonn.concat(blng1);
+        // //     ///OLD//////////////////////
+        //     xx[i] = x[i] - xoffset;
+        //     //console.log(xx)
+        //     yy[i] = ynew[i] - yoffset;
+        //     //console.log(yy)
+        //     angle[i] = wd / RADIANS;//rotation_angle_degs/ RADIANS;
+        //     r[i] = sqrt(xx[i] * xx[i] + yy[i] * yy[i]);
+        //     //console.log(r[i])
+        //     ct[i] = xx[i] / r[i];
+        //     st[i] = yy[i] / r[i];
+        //     xxx[i] = r[i] * ((ct[i] * cos(angle[i])) + (st[i] * sin(angle[i])));
+        //     yyy[i] = r[i] * ((st[i] * cos(angle[i])) - (ct[i] * sin(angle[i])));
+        //     d2rlat[i] = olat/RADIANS;
+        //     d2rlon[i] = (111415.13 * cos(d2rlat[i])) - (94.55 * cos(3.0 * d2rlat[i])) + (0.12 * cos(5.0 * d2rlat[i]));
+        //     d2rlat[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat[i])) + (1.20 * cos(4.0 * d2rlat[i])) - (0.002 * cos(6.0 * d2rlat[i])));
+        //     //console.log(d2rlat);
+        //     // console.log(d2rlon);
+        //     plon[i] = olon + xxx[i] / d2rlon[i];
+        //     plat[i] = olat + yyy[i] / d2rlat[i];
+
+
+        //     xx1[i] = x[i] - xoffset;
+        //     yy1[i] = -ynew[i] - yoffset;
+        //     angle1[i] = wd / RADIANS; //rotation_angle_degs/ RADIANS;
+        //     r1[i] = sqrt(xx1[i] * xx1[i] + yy1[i] * yy1[i]);
+        //     ct1[i] = xx1[i] / r1[i];
+        //     st1[i] = yy1[i] / r1[i];
+        //     xxx1[i] = r1[i] * ((ct1[i] * cos(angle1[i])) + (st1[i] * sin(angle1[i])));
+        //     yyy1[i] = r1[i] * ((st1[i] * cos(angle1[i])) - (ct1[i] * sin(angle1[i])));
+        //     d2rlat1[i] = olat/RADIANS;
+        //     d2rlon1[i] = (111415.13 * cos(d2rlat1[i])) - (94.55 * cos(3.0 * d2rlat1[i])) + (0.12 * cos(5.0 * d2rlat1[i]));
+        //     d2rlat1[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat1[i])) + (1.20 * cos(4.0 * d2rlat1[i])) - (0.002 * cos(6.0 * d2rlat1[i])));
+
+        //     plon1[i] = olon + xxx1[i] / d2rlon1[i];
+        //     plat1[i] = olat + yyy1[i] / d2rlat1[i];
+        
+
+            
+        //     lat0[i] =plat[i];
+        //     lng0[i] = plon[i];
+        //     lat1[i]=plat1[i]
+        //     lng1[i] = plon1[i] 
+        //     if (bounce_y.indexOf(ynew[i]) != -1){
+        //         blat0[i] =lat0[i];
+        //         blng0[i] = lng0[i];
+        //         blat1[i]=lat1[i];
+        //         blng1[i] = lng1[i];
+        //     } 
+
+
+        // };
+        // latt = lat0.reverse();
+        // lonn = lng0.reverse();
+        // lattt = latt.concat(lat1);
+        // lonnn = lonn.concat(lng1);
+
+        // console.log("LATTTT:", lattt);
+        // console.log("LONNN:", lonnn);
+        // blatt = blat0.reverse();
+        // blonn = blng0.reverse();//.reverse();
+        // blattt = blatt.concat(blat1);
+        // blonnn = blonn.concat(blng1);
+
+        /////ENDOLDDDD///////////////////////////////////
+        
 
         var cityCircle = new google.maps.Circle({
             strokeColor: strokeColor,
@@ -409,12 +463,14 @@ function translate_coordinates(strokeColor, zone, Us, H) {
             fillOpacity: 0,
             map: map,
             center: {lat:latitude, lng: longitude},
-            radius:Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
+            radius: Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
         });
         //lng = lng.reverse();
         cityCircle.addListener('click', showNewRect);
 
         var maxRect = Math.max(r[i])/1000;
+
+
         for (i in lattt){
             lat = lattt[i];
             lng = lonnn[i];
@@ -432,6 +488,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         // This example creates a simple polygon representing the Bermuda Triangle.
         // When the user clicks on the polygon an info window opens, showing
         // information about the polygon's coordinates 
+        console.log(triangleCoords);
         var bermudaTriangle = new google.maps.Polygon({
 
             paths: triangleCoords,
@@ -482,6 +539,68 @@ function translate_coordinates(strokeColor, zone, Us, H) {
     }
 };
 
+function DEG_TO_RADIANS(x){
+    return (x/RADIANS);
+}
+//helper functions for latlon conversion
+function METERS_DEGLON(x)
+{  
+   with (Math)
+   {
+      var d2r=DEG_TO_RADIANS(x);
+      return((111415.13 * cos(d2r))- (94.55 * cos(3.0*d2r)) + (0.12 * cos(5.0*d2r)));
+   }
+}
+
+function METERS_DEGLAT(x)
+{
+   with (Math)
+   {
+      var d2r=DEG_TO_RADIANS(x);
+      return(111132.09 - (566.05 * cos(2.0*d2r))+ (1.20 * cos(4.0*d2r)) - (0.002 * cos(6.0*d2r)));
+   }
+}
+
+// #   translate_coordinates
+// #   routine to translate between geographic and cartesian coordinates
+// #   user must supply following data on the cartesian coordinate system:
+// #   location of the origin in lat/lon degrees;
+// #   rotational skew from true north in degrees;
+// #   N.B. sense of rotation i/p here is exactly as o/p by ORIGIN
+// #   x/y offset in meters - only if an offset was used during the
+// #   running of prog ORIGIN;
+// */porg={x:sx,y:sy,coord_system:1,olat:olat,
+//olon:olon,xoffset_mtrs:0,yoffset_mtrs:0,rotation_angle_degs:0,rms_error:0};
+
+//need porg = {x:,y:,rotation_angle_degs:,xoffset,yoffset,}
+//xy_to_latlon(x, y, olon, olat, wd, xoffset, yoffset)
+function xy_to_latlon(x, y, olon, olat, rotation_angle_degs, xoffset, yoffset){
+   with(Math)
+   {   
+      var xx,yy,xxx,yyy,r,ct,st,angle;
+      angle = DEG_TO_RADIANS(rotation_angle_degs); //0 
+     /* X,Y to Lat/Lon Coordinate Translation  */
+     xx = x - xoffset; // set offset to 0
+     yy = y - yoffset;
+     r = sqrt(xx*xx + yy*yy);
+
+     if(r){
+        ct = xx/r;
+        st = yy/r;
+        xxx = r * ( (ct * cos(angle))+ (st * sin(angle)) );
+        yyy = r * ( (st * cos(angle))- (ct * sin(angle)) );
+     }
+     //olon,olat are origin lat/lon
+     var plon = olon + xxx/METERS_DEGLON(olat);
+     var plat = olat + yyy/METERS_DEGLAT(olat);
+
+    var sll={lat:plat, lng:plon};
+    return(sll);    
+  }
+};
+
+
+
 //set and display defaults for sliders
 function setSliderValues(sliders){
     for (i in sliders){
@@ -507,7 +626,7 @@ $( document ).ready(function() {
         h = parseInt($(this).val());
         drawNewMap();
     });
-    $("#xRange").on('change', function(){
+    $("#XmaxRange").on('change', function(){
         Xmax = $(this).val();
         drawNewMap();
     });
@@ -563,6 +682,28 @@ $( document ).ready(function() {
         //console.log(sc);
         drawNewMap();
     });
+
+$( function() {
+    $( "#slider-range" ).slider({
+      range: true,
+      min: 2,
+      max: 500,
+      values: [ 5, 100 ],
+      slide: function( event, ui ) {
+        $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );    
+        polution_min = $( "#slider-range" ).slider( "values", 0 );
+        var multiplier = Math.floor((polution_max-polution_min)/5);
+        for (i in polution_levels){
+            polution_levels[i]['level']=polution_min+(i*multiplier);
+        }
+        polution_max = $( "#slider-range" ).slider( "values", 1 );
+        drawNewMap();
+      }
+    });
+    $( "#amount" ).val( "$" + $( "#slider-range" ).slider( "values", 0 ) +
+      " - $" + $( "#slider-range" ).slider( "values", 1 ) );
+  } );
+
 
 });
 
