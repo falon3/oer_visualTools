@@ -185,6 +185,13 @@
        <label>X: Max distance X from stack = <output class="sliderout" id="XmaxOut"></output> m</label><br>  
        <input class="userdata" type="range"  id="XmaxRange" min="100" max="20000" oninput="XmaxOut.value = XmaxRange.value"><br>
        
+       <label>z: z-axis level of measurement at</label><br>
+       <select id="z">
+        <option value ="plume">Plume (z=H)</option>
+        <option value ="ground">Ground (z=0)</option>
+      </select>
+      <br>
+        <br>
        <label>sc: Stability Class</label><br>
        <select id="sclass">
           <option value="d">D</option>

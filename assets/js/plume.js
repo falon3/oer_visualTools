@@ -31,7 +31,8 @@ var defaults = {
   "ds": 2,
   "Ts": 400,
   "Ta": 283,
-  "Pa": 1032
+  "Pa": 1032,
+  "z": "plume"
 };       
 // all values that have slider changeable values
 var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
@@ -78,6 +79,7 @@ var ds = defaults["ds"];
 var Ts = defaults["Ts"];
 var Ta = defaults["Ta"];
 var Pa = defaults["Pa"];
+var z = defaults["z"];
 // setup map
 var map;
 var zoom = 14;
@@ -178,11 +180,13 @@ function initMap() {
 function translate_coordinates(strokeColor, zone, Us, H) {
     with (Math) {
                  // var xx, yy, r, ct, st, angle;
+        if (z=="plume") z = H;
+        else if (z=="ground") z=0;
+
         olat = latitude;
         olon = longitude;
         rotation_angle_degs = wd;
         var ynew = [];
-        var z = H; // this is for topview
         var xoffset = 0;
         var yoffset = 0;
         var last = 0;
@@ -338,9 +342,9 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                                                          *(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))
                                                                       +0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
                    } 
-                   if (isNaN(y5[i])==false){
-                        last = y5[i];
-                   }
+                   // if (isNaN(y5[i])==false){
+                   //      last = y5[i];
+                   // }
                    
                    // keep track of the line where the plume hits ground
                    if (abs(sigz[i]-(H))<0.5){
@@ -358,24 +362,26 @@ function translate_coordinates(strokeColor, zone, Us, H) {
 
         for (i in ynew){
 
+            //if (ynew[i]>=ynew[i-1]){ // for half ellipticals
             ///////NEWWWWWWWWWWWWWW////////////////////
-            var yy = ynew[i] - yoffset;
-            var y_left = -ynew[i] - yoffset;
-            var xx = x[i] - xoffset;
-            var coords_right = xy_to_latlon(xx, yy, olon, olat, wd, xoffset, yoffset);
-            var coords_left = xy_to_latlon(xx, -yy, olon, olat, wd, xoffset, yoffset);
-            lat0[i]=coords_right.lat;
-            lng0[i]=coords_right.lng;
-            lat1[i]=coords_left.lat;
-            lng1[i]=coords_left.lng;
-            r[i] = sqrt(xx*xx + yy*yy);
+                var yy = ynew[i] - yoffset;
+                var y_left = -ynew[i] - yoffset;
+                var xx = x[i] - xoffset;
+                var coords_right = xy_to_latlon(xx, yy, olon, olat, wd, xoffset, yoffset);
+                var coords_left = xy_to_latlon(xx, -yy, olon, olat, wd, xoffset, yoffset);
+                lat0[i]=coords_right.lat;
+                lng0[i]=coords_right.lng;
+                lat1[i]=coords_left.lat;
+                lng1[i]=coords_left.lng;
+                r[i] = sqrt(xx*xx + yy*yy);
 
-            if (bounce_y.indexOf(x[i]) != -1){
-                blat0[i] =lat0[i];
-                blng0[i] = lng0[i];
-                blat1[i]=lat1[i];
-                blng1[i] = lng1[i];
-            }
+                if (bounce_y.indexOf(x[i]) != -1){
+                    blat0[i] =lat0[i];
+                    blng0[i] = lng0[i];
+                    blat1[i]=lat1[i];
+                    blng1[i] = lng1[i];
+                }
+            //}
         }
         
         lattt = lat0.reverse().concat(lat1);
@@ -697,6 +703,11 @@ $( document ).ready(function() {
         var sloc = $(this).val();
         var cl = $("#sclass").val();
         sc = sloc+cl;
+        //console.log(sc);
+        drawNewMap();
+    });
+    $("#z").on('change', function(){
+        z = $(this).val();
         //console.log(sc);
         drawNewMap();
     });
