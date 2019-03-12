@@ -339,8 +339,8 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                     }
                     else { //after plume hits the ground)   
                          y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
-                                                         *(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))
-                                                                      +0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
+                                                         *(Math.exp(-0.5*Math.pow((z-H)/sigz[i],2))
+                                                                      +Math.exp(-0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
                    } 
                    //if (y5[i]<0) y5[i]=-y5[i];
                    // if (isNaN(y5[i])==false){
