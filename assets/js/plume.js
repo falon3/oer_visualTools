@@ -17,7 +17,7 @@
 //      "Pa": atmospheric pressure at ground level (mb)
 
 var defaults = {
-  "wd": 90, // it's wd-90 
+  "wd": 180, // it's wd-90 
   "ws":4,
   "Q": 250000000,
   //"mw": 17,
@@ -35,7 +35,7 @@ var defaults = {
   "z": "plume"
 };       
 // all values that have slider changeable values
-var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
+var all_sliders = ["Q","Xmax","ws","wd","Z1","Pa","h","ds","Vs","Ts","Ta"];
 
 // COLOR CODES FOR REGIONS
 //each colored area with so much μg/m^3 concentration
@@ -64,7 +64,7 @@ var config = {
 //SETUP Globals
 firebase.initializeApp(config);
 var event = firebase.database().ref('TR')
-var wd = defaults["wd"];
+var wd = defaults["wd"]-90;
 var ws = defaults["ws"];
 var Q = defaults["Q"];
 var mw = defaults["mw"];
@@ -200,7 +200,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         x = [0, 2];
         var k = 1;
         while (x[k] < Xmax-5){
-             x.push(x[k]+2);
+             x.push(x[k]+1);
              k=k+1;
         }
         var sigy =[];
@@ -342,12 +342,13 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                                                          *(1/Math.exp(0.5*(Math.pow((z-H)/sigz[i],2))
                                                                       +0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
                    } 
+                   //if (y5[i]<0) y5[i]=-y5[i];
                    // if (isNaN(y5[i])==false){
                    //      last = y5[i];
                    // }
                    
                    // keep track of the line where the plume hits ground
-                   if (abs(sigz[i]-(H))<0.5){
+                   if (abs(sigz[i]-(H/2.15))<0.5){
                             bounce_y.push(x[i]);
                         }
                    //yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
@@ -362,13 +363,13 @@ function translate_coordinates(strokeColor, zone, Us, H) {
 
         for (i in ynew){
 
-            //if (ynew[i]>=ynew[i-1]){ // for half ellipticals
+            //if (ynew[i]>=0){ // for half ellipticals
             ///////NEWWWWWWWWWWWWWW////////////////////
                 var yy = ynew[i] - yoffset;
-                var y_left = -ynew[i] - yoffset;
+                var y_left = -(ynew[i] - yoffset);
                 var xx = x[i] - xoffset;
-                var coords_right = xy_to_latlon(xx, yy, olon, olat, wd, xoffset, yoffset);
-                var coords_left = xy_to_latlon(xx, -yy, olon, olat, wd, xoffset, yoffset);
+                var coords_right = xy_to_latlon(xx, yy, olon, olat, rotation_angle_degs, xoffset, yoffset);
+                var coords_left = xy_to_latlon(xx, y_left, olon, olat, rotation_angle_degs, xoffset, yoffset);
                 lat0[i]=coords_right.lat;
                 lng0[i]=coords_right.lng;
                 lat1[i]=coords_left.lat;
@@ -457,18 +458,18 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         /////ENDOLDDDD///////////////////////////////////
         
 
-        var cityCircle = new google.maps.Circle({
-            strokeColor: strokeColor,
-            strokeOpacity: 0.3,
-             // strokeWeight: 2,
-              //fillColor: '#FF0000',
-            fillOpacity: 0,
-            map: map,
-            center: {lat:latitude, lng: longitude},
-            radius: Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
-        });
-        //lng = lng.reverse();
-        cityCircle.addListener('click', showNewRect);
+        // var cityCircle = new google.maps.Circle({
+        //     strokeColor: strokeColor,
+        //     strokeOpacity: 0.3,
+        //      // strokeWeight: 2,
+        //       //fillColor: '#FF0000',
+        //     fillOpacity: 0,
+        //     map: map,
+        //     center: {lat:latitude, lng: longitude},
+        //     radius: Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
+        // });
+        // //lng = lng.reverse();
+        // cityCircle.addListener('click', showNewRect);
 
         var maxRect = Math.max(r[i])/1000;
 
@@ -501,6 +502,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
             someRandomData: "I'm a custom tooltip :-)"
 
         });
+        bermudaTriangle.addListener('click', showNewRect);
 
         var bounceTriangle = new google.maps.Polygon({
 
@@ -601,7 +603,8 @@ function xy_to_latlon(x, y, olon, olat, rotation_angle_degs, xoffset, yoffset){
 function setSliderValues(sliders){
     for (i in sliders){
         $("#"+sliders[i]+"Range").val(defaults[sliders[i]]);
-        $("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
+        //$("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
+        $("#"+sliders[i]+"Out").val(defaults[sliders[i]]);
     }
 }
 
@@ -631,55 +634,68 @@ $( function() {
       " - " + $( "#slider-range" ).slider( "values", 1 )); // initially
   } );
 
+function labelWindDirection(){
+    var wstring = "";
+    var display_wd = $("#wdOut").val();
+    if ((0<=display_wd && display_wd<90) || (270<display_wd && display_wd<360)) wstring= "N";
+    if (90<display_wd && display_wd<=180) wstring = "S";
+
+    if (0<display_wd && display_wd<180) wstring=wstring.concat("E");
+    if (180<display_wd && display_wd<360) wstring=wstring.concat("W");
+
+    $("#wdLetter").html("&#176;"+wstring);
+}
 
 
 $( document ).ready(function() {
 
     setSliderValues(all_sliders);
+    labelWindDirection();
     console.log( "ready!" );
     // Update from user input changes
-    $("#wsRange").on('change', function(){
+    $("input[name='ws']").on('change', function(){
         ws = parseInt($(this).val());
         drawNewMap();
     });
-    $("#QRange").on('change', function(){
+    $("input[name='Q']").on('change', function(){
         Q = parseInt($(this).val());
         drawNewMap();
     });
-    $("#hRange").on('change', function(){
+    $("input[name='h']").on('change', function(){
         h = parseInt($(this).val());
         drawNewMap();
     });
-    $("#XmaxRange").on('change', function(){
+    $("input[name='Xmax']").on('change', function(){
         Xmax = $(this).val();
         drawNewMap();
     });
-    $("#Z1Range").on('change', function(){
+    $("input[name='Z1']").on('change', function(){
         Z1 = $(this).val();
         drawNewMap();
     });
-    $("#VsRange").on('change', function(){
+    $("input[name='Vs']").on('change', function(){
         Vs = $(this).val();
         drawNewMap();
     });
-    $("#dsRange").on('change', function(){
+    $("input[name='ds']").on('change', function(){
         ds = $(this).val();
         drawNewMap();
     });
-    $("#TsRange").on('change', function(){
+    $("input[name='Ts']").on('change', function(){
         Ts = $(this).val();
         drawNewMap();
     });
-    $("#TaRange").on('change', function(){
+    $("input[name='Ta']").on('change', function(){
         Ta = $(this).val();
         drawNewMap();
     });
-    $("#PaRange").on('change', function(){
+    $("input[name='Pa']").on('change', function(){
         Pa = $(this).val();
         drawNewMap();
     });
-    $("#wd").on('change', function(){
-        wd = $(this).val();
+    $("input[name='wd']").on('change', function(){
+        wd = $(this).val()-90;
+        labelWindDirection();
         drawNewMap();
     });
     $("#lat").on('change', function(){
@@ -712,17 +728,5 @@ $( document ).ready(function() {
         drawNewMap();
     });
 
-    // $( "#slider-range" ).slider("values").change(function(){
-        // var levels = Object.keys(polution_levels);   
-        // var vmin = $( "#slider-range" ).slider( "values", 0 );
-        // var vmax = $( "#slider-range" ).slider( "values", 1 );
-        // var multiplier = Math.floor((vmax-vmin)/(levels.length-1));
-        // for (var i=0; i<levels.length-1 ;i++){
-        //      polution_levels[i]['level']=vmin+(i*multiplier);
-        // }
-        // console.log($( "#slider-range" ).slider( "values", 1 ));
-        // polution_levels[levels.length-1]['level'] = $( "#slider-range" ).slider( "values", 1 );
-        // drawNewMap();
-    //});
 });
 

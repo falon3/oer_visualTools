@@ -58,6 +58,7 @@
       .sliderout{
         font-weight: bold; 
         font-size:large;
+        width:75px;
       }
 
       .userdata{
@@ -142,48 +143,38 @@
       </div>
       
     	<div id="data">
-       <label>Q: Source strength of Contaminant = <output class="sliderout" id="QOut"></output> μg/s</label><br>
-       <input class="userdata" type="range"  id="QRange" min="1000000" max="500000000" oninput="QOut.value = QRange.value"><br>
+       <label>Q: Source strength of Contaminant = <input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input> μg/s</label><br>
+       <input class="userdata" name="Q" type="range"  id="QRange" min="1000000" max="500000000" oninput="QOut.value = QRange.value"><br>
 
-       <label>ws: Wind Speed from Meteorological Tower = <output class="sliderout" id="wsOut"></output> m/s</label><br>
-       <input class="userdata" type="range"  id="wsRange"  min="0" max="60" oninput="wsOut.value = wsRange.value"><br>   
+       <label>ws: Wind Speed from Meteorological Tower = <input name="ws" class="sliderout" id="wsOut" style="width:40px;" oninput="wsRange.value=wsOut.value"></input> m/s</label><br>
+       <input class="userdata" name="ws" type="range"  id="wsRange"  min="0" max="60" oninput="wsOut.value = wsRange.value"><br>   
 
-       <label>Z1: Height of Tower = <output class="sliderout" id="Z1Out"></output> m</label><br>
-       <input class="userdata" type="range"  id="Z1Range"  min="0" max="60" oninput="Z1Out.value = Z1Range.value"><br>
+       <label>Z1: Height of Tower = <input name="Z1" class="sliderout" id="Z1Out" oninput="Z1Range.value=Z1Out.value"></input> m</label><br>
+       <input class="userdata" name="Z1" type="range"  id="Z1Range"  min="0" max="60" oninput="Z1Out.value = Z1Range.value"><br>
        
-       <label>Pa: Atmospheric Pressure at Ground Level = <output class="sliderout" id="PaOut"></output> mb</label><br> 
-       <input class="userdata" type="range"  id="PaRange"  min="300" max="4000" oninput="PaOut.value = PaRange.value"><br>
+       <label>Pa: Atmospheric Pressure at Ground Level = <input name="Pa" class="sliderout" id="PaOut" oninput="PaRange.value=PaOut.value"></input> mb</label><br> 
+       <input class="userdata" type="range"   name="Pa" id="PaRange"  min="300" max="4000" oninput="PaOut.value = PaRange.value"><br>
        
-       <label>wd: Wind Direction</label><br>
-       <select id="wd">
-          <option value=90>South</option>
-          <option value=45>SouthEast</option>
-          <option value=0>East</option>
-          <option value=315>NorthEast</option>
-          <option value=270>North</option>
-          <option value=225>NorthWest</option>
-          <option value=180>West</option>
-          <option value=135>SouthWest</option>
-        </select>
-        <br>
-        <br>
-       <label>h: Physical Height of Stack = <output class="sliderout" id="hOut"></output> m</label><br>
-       <input class="userdata" type="range"  id="hRange" min="1" max="200" oninput="hOut.value = hRange.value"><br>
-       
-       <label>ds: Inside Diameter of Stack = <output class="sliderout" id="dsOut"></output> m</label><br>      
-       <input class="userdata" type="range"  id="dsRange" min="1" max="10" oninput="dsOut.value = dsRange.value"><br>
+       <label >wd: Wind Direction = <input name ="wd" class="sliderout" id = "wdOut" oninput="wdRange.value=wdOut.value"></input><span id="wdLetter"></span></label><br> 
+       <input class="userdata" type="range"   name="wd" id="wdRange"  min="0" max="359" oninput="wdOut.value = wdRange.value"><br>
 
-       <label>Vs: Vertical Stack Gas Velocity = <output class="sliderout" id="VsOut"></output> m/sec</label><br>
-       <input class="userdata" type="range"  id="VsRange" min="1" max="50" oninput="VsOut.value = VsRange.value"><br>
+       <label>h: Physical Height of Stack = <input class="sliderout" name="h" id="hOut" oninput="hRange.value=hOut.value"></input> m</label><br>
+       <input class="userdata" type="range" name="h" id="hRange" min="1" max="200" oninput="hOut.value = hRange.value"><br>
+       
+       <label>ds: Inside Diameter of Stack = <input name="ds" class="sliderout" id="dsOut" oninput="dsRange.value=dsOut.value"></input> m</label><br>      
+       <input class="userdata" name="ds" type="range"  id="dsRange" min="1" max="10" oninput="dsOut.value = dsRange.value"><br>
+
+       <label>Vs: Vertical Stack Gas Velocity = <input name="Vs" class="sliderout" id="VsOut" oninput="VsRange.value=VsOut.value"></input> m/sec</label><br>
+       <input class="userdata" name="Vs" type="range"  id="VsRange" min="1" max="50" oninput="VsOut.value = VsRange.value"><br>
       
-       <label>Ts: Temp of Exhaust Gas Stream at Stack Outlet = <output class="sliderout" id="TsOut"></output> K</label><br>
-       <input class="userdata" type="range"  id="TsRange" min="200" max="500" oninput="TsOut.value = TsRange.value"><br>
+       <label>Ts: Exhaust Gas Stream Temp at Stack Outlet = <input name="Ts" class="sliderout" id="TsOut" oninput="TsRange.value=TsOut.value"></input> K</label><br>
+       <input class="userdata" name="Ts" type="range"  id="TsRange" min="200" max="500" oninput="TsOut.value = TsRange.value"><br>
       
-       <label>Ta: Temp of Atmosphere at Stack Outlet = <output class="sliderout" id="TaOut"></output> K</label><br>
-       <input class="userdata" type="range"  id="TaRange" min="200" max="500" oninput="TaOut.value = TaRange.value"><br>
+       <label>Ta: Temp of Atmosphere at Stack Outlet = <input name="Ta" class="sliderout" id="TaOut" oninput="TaRange.value=TaOut.value"></input> K</label><br>
+       <input class="userdata" name="Ta" type="range"  id="TaRange" min="200" max="500" oninput="TaOut.value = TaRange.value"><br>
 
-       <label>X: Max distance X from stack = <output class="sliderout" id="XmaxOut"></output> m</label><br>  
-       <input class="userdata" type="range"  id="XmaxRange" min="100" max="20000" oninput="XmaxOut.value = XmaxRange.value"><br>
+       <label>X: Max distance X from stack = <input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> m</label><br>  
+       <input class="userdata" type="range" name="Xmax" id="XmaxRange" min="100" max="20000" oninput="XmaxOut.value = XmaxRange.value"><br>
        
        <label>z: z-axis level of measurement at</label><br>
        <select id="z">
