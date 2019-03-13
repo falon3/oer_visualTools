@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+  <head >    
+        <!-- Plugins and Libraries -->
+    <script type="text/javascript" src="assets/js/jquery.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery-ui.min.js"></script>
+    <script type='text/javascript' src='assets/js/math.min.js'></script>
+    <script type="text/javascript" 
+          src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+    <script type="text/javascript" 
+          src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <script type='text/javascript' src="config/formulas.js"></script>
+    <script type='text/javascript' src="assets/js/plumeSide.js"></script>
+    </script>
+
+    
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Polygon Arrays</title>
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+       #container{
+            height: 100%;
+      
+        }
+      #chart_div {
+        float: left;
+        height: 100%;
+        width: 70%;
+        box-sizing: border-box;
+            padding: 10px;
+      }
+      #data{
+        float:right;
+        width:30%;
+        height: 100%;
+        overflow: auto;
+        box-sizing: border-box;
+        padding: 10px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      .userdata{
+            margin-bottom: 10px;
+      }
+      label{
+        font-weight: bold;
+      }
+    </style>
+
+  </head>
+  
+  <body>
+
+    <div id="container">
+        <div id="chart_div""></div>
+        <div id="data">
+       <label>Q: Source strength of contaminant (μg/s)</label>
+       <br>
+       <input type=number class="userdata" id ="Q" value=25000000>
+       <br><br>
+       <label>ws: Wind Speed from Meteorological Tower (m/s)</label>
+       <br>
+       <input type=number class="userdata" id ="ws" value=5>
+       <br>
+       <label>Z1: Height of Tower (m)</label>
+       <br>
+       <input type=number class="userdata" id ="Z1" value=10>
+       <br>
+       <label>Pa: Atmospheric Pressure at Ground Level (mb)</label>
+       <br>
+       <input type=number class="userdata" id ="Pa" value=1032>
+       <br>
+       <label>wd: Wind Direction</label>
+       <br>
+       <select id="wd">
+          <option value=90>South</option>
+          <option value=45>SouthEast</option>
+          <option value=0>East</option>
+          <option value=315>NorthEast</option>
+          <option value=270>North</option>
+          <option value=225>NorthWest</option>
+          <option value=180>West</option>
+          <option value=135>SouthWest</option>
+        </select>
+        <br>
+        <br>
+       <label>h: Physical Height of Stack (m)</label>
+       <br>
+       <input type=number class="userdata" id ="h" value="50">
+       <br>
+       <label>ds: Inside Diameter of Stack (m)</label>
+       <br>
+       <input type=number class="userdata" id ="ds" value="2">
+       <br>
+       <label>Vs: Vertical Stack Gas Velocity (m/sec)</label>
+       <br>
+       <input type=number class="userdata" id ="Vs" value="20">
+       <br>
+       <label>Ts: Temp of Exhaust Gas Stream at Stack Outlet (K)</label>
+       <br>
+       <input type=number class="userdata" id ="Ts" value="400">
+       <br>
+       <label>Ta: Temp of Atmosphere at Stack Outlet (K)</label>
+       <br>
+       <input class="userdata" id ="Ta" value="283">
+       <br>
+       <br>
+       <label>X: Max distance X from stack (m)</label>
+       <br><br>
+       <input class="userdata" type="range"  id="xRange" value="1000" min="100" max="10000" oninput="xOutputId.value = xRange.value">
+   <output style="color: darkblue; font-weight: bold; font-size: x-large;" id="xOutputId">1000</output>
+       <br>
+       <label>sc: Stability Class</label>
+       <br>
+       <select id="sclass">
+          <option value="d">D</option>
+          <option value="a">A</option>
+          <option value="b">B</option>
+          <option value="c">C</option>
+          <option value="e">E</option>
+          <option value="f">F</option>
+        </select>
+        <select id="sloc">
+           <option value="u">Urban</option>
+          <option value="r">Rural</option>        
+        </select>
+        <br>
+      </div>
+
+    </div>
+  </body>
+</html>
