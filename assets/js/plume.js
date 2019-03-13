@@ -15,6 +15,7 @@
 //      "Ts": temp of exhaust gas stream at stack outlet (K)
 //      "Ta": temp of the atmosphere at stack outlet (K)
 //      "Pa": atmospheric pressure at ground level (mb)
+//      "z": is level of measuring concentration at (either ground or plume height)
 
 var defaults = {
   "wd": 180, // it's wd-90 
@@ -180,12 +181,13 @@ function initMap() {
 function translate_coordinates(strokeColor, zone, Us, H) {
     with (Math) {
                  // var xx, yy, r, ct, st, angle;
-        if (z=="plume") z = H;
-        else if (z=="ground") z=0;
+        var z_num; //convert z from the word decription to a number
+        if (z=="plume") z_num = H;
+        else if (z=="ground") z_num=0;
 
-        olat = latitude;
-        olon = longitude;
-        rotation_angle_degs = wd;
+        var olat = latitude;
+        var olon = longitude;
+        var rotation_angle_degs = wd;
         var ynew = [];
         var xoffset = 0;
         var yoffset = 0;
@@ -197,7 +199,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var bounce_y = [];
 
     //x = [10, 100, 1000, 5000, 10000];
-        x = [0, 2];
+        var x = [0, 2];
         var k = 1;
         while (x[k] < Xmax-5){
              x.push(x[k]+1);
@@ -221,7 +223,10 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var lonnn = [];
         var blattt = [];
         var blonnn =[];
-
+        var final_x = [];
+        var final_y = [];
+        var latLng = {};
+        var blatLng = {};
 
         //OLLLDDDDDDDDDDDD?????????????????????.///////////////
 
@@ -280,8 +285,6 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         // var blonn = [];
         // var blattt = [];
         // var blonnn = [];
-
-
         // if (t2)
         
         //////END OLD?????????????????///////////////
@@ -335,39 +338,35 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                    //y5[i] = sigy[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5); //old simpler formula
                    //find the Y that yields this C(x,y,z)==cdes5(max concentration for this region) and make that the bounding arcline
                    if (sigz[i]<(H/2.15)){
-                        y5[i]  = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z-H)/sigz[i],2)),0.5));
+                        y5[i]  = sigy[i]*(Math.pow(2*log(ccen[i]/cdes5)-(Math.pow((z_num-H)/sigz[i],2)),0.5));
                     }
                     else { //after plume hits the ground)   
                          y5[i] = sigy[i]*(Math.pow(2*log((ccen[i]/cdes5)
-                                                         *(Math.exp(-0.5*Math.pow((z-H)/sigz[i],2))
-                                                                      +Math.exp(-0.5*(Math.pow((z+H)/sigz[i],2))))), 0.5));
+                                                         *(Math.exp(-0.5*Math.pow((z_num-H)/sigz[i],2))
+                                                                      +Math.exp(-0.5*(Math.pow((z_num+H)/sigz[i],2))))), 0.5));
                    } 
-                   //if (y5[i]<0) y5[i]=-y5[i];
-                   // if (isNaN(y5[i])==false){
-                   //      last = y5[i];
-                   // }
-                   
+                   if (isNaN(y5[i])==false){
+                        final_x.push(x[i]);
+                        final_y.push(y5[i]);
+                   }
                    // keep track of the line where the plume hits ground
                    if (abs(sigz[i]-(H/2.15))<0.5){
                             bounce_y.push(x[i]);
                         }
-                   //yn[i] = -y5[i];  //get mirrored side of X axis//sigyn[i]*Math.pow((2*log(ccen[i]/cdes5)), 0.5);
-                   
-               while(isNaN(y5[i])==false){
-                    var c = i+1;
-                    ynew = y5.slice(0,c);
-                    break;   
-                }
         }
 
-
-        for (i in ynew){
-
+        //console.log(ynew);
+        for (i in final_y){
             //if (ynew[i]>=0){ // for half ellipticals
             ///////NEWWWWWWWWWWWWWW////////////////////
-                var yy = ynew[i] - yoffset;
-                var y_left = -(ynew[i] - yoffset);
-                var xx = x[i] - xoffset;
+                var yy = final_y[i];
+                var y_left = -final_y[i];
+                var xx = final_x[i];
+
+
+                // var yy = ynew[i] - yoffset;
+                // var y_left = -(ynew[i] - yoffset);
+                // var xx = x[i] - xoffset;
                 var coords_right = xy_to_latlon(xx, yy, olon, olat, rotation_angle_degs, xoffset, yoffset);
                 var coords_left = xy_to_latlon(xx, y_left, olon, olat, rotation_angle_degs, xoffset, yoffset);
                 lat0[i]=coords_right.lat;
@@ -376,7 +375,9 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                 lng1[i]=coords_left.lng;
                 r[i] = sqrt(xx*xx + yy*yy);
 
-                if (bounce_y.indexOf(x[i]) != -1){
+
+                if (bounce_y.indexOf(final_x[i]) != -1){
+                //if (bounce_y.indexOf(x[i]) != -1){
                     blat0[i] =lat0[i];
                     blng0[i] = lng0[i];
                     blat1[i]=lat1[i];
@@ -458,18 +459,18 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         /////ENDOLDDDD///////////////////////////////////
         
 
-        // var cityCircle = new google.maps.Circle({
-        //     strokeColor: strokeColor,
-        //     strokeOpacity: 0.3,
-        //      // strokeWeight: 2,
-        //       //fillColor: '#FF0000',
-        //     fillOpacity: 0,
-        //     map: map,
-        //     center: {lat:latitude, lng: longitude},
-        //     radius: Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
-        // });
-        // //lng = lng.reverse();
-        // cityCircle.addListener('click', showNewRect);
+        var cityCircle = new google.maps.Circle({
+            strokeColor: strokeColor,
+            strokeOpacity: 0.3,
+             // strokeWeight: 2,
+              //fillColor: '#FF0000',
+            fillOpacity: 0,
+            map: map,
+            center: {lat:latitude, lng: longitude},
+            radius: Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
+        });
+        //lng = lng.reverse();
+        //cityCircle.addListener('click', showNewRect);
 
         var maxRect = Math.max(r[i])/1000;
 
@@ -484,8 +485,8 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         for (i in blattt){
             lat = blattt[i];
             lng = blonnn[i];
-            latLng = {lat,lng};
-            bounceCoords.push(latLng)
+            blatLng = {lat,lng};
+            bounceCoords.push(blatLng)
         }
         //console.log(triangleCoords);
         // This example creates a simple polygon representing the Bermuda Triangle.
@@ -502,8 +503,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
             someRandomData: "I'm a custom tooltip :-)"
 
         });
-        bermudaTriangle.addListener('click', showNewRect);
-
+        
         var bounceTriangle = new google.maps.Polygon({
 
             paths: bounceCoords,
