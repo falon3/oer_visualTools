@@ -135,7 +135,7 @@ function make_plot(Us, H) {
         }
         var k = 1;
         while (z[k] < Zmax-1){
-             z.push(z[k]+10);  
+             z.push(z[k]+5);  
              k=k+1;
         }
 
@@ -276,10 +276,12 @@ function drawChart() {
           colorAxis: {colors: ['yellow', 'red'], maxValue: 250, minValue:5},
           sizeAxis: {minSize:7, minValue:0, maxSize:7},
             hAxis: {title: 'X'},
-            vAxis: {title: 'Z', viewWindowMode: 'pretty'},
+            vAxis: {title: 'Z', viewWindowMode: 'pretty', maxValue:500},
             sortBubblesBySize: false,
             bubble: {opacity: 0.6},
-            chartArea:{width:'80%',height:'80%'}
+            chartArea:{width:'80%',height:'80%'},
+           width: 1000,
+           height: 700
         };
 
         
