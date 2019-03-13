@@ -6,6 +6,6 @@ To run: Clone this repo and open plotter.html, distribution.html, or plume.html 
 
 Or view the rendered pages here:        
 https://falon3.github.io/oer_visualTools/plume.html      
-https://falon3.github.io/oer_visualTools/sideplume.html       
+https://falon3.github.io/oer_visualTools/plumeSide.html       
 https://falon3.github.io/oer_visualTools/plotter.html        
 https://falon3.github.io/oer_visualTools/distribution.html    
