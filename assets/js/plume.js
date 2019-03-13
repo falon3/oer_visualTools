@@ -470,7 +470,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
             radius: Math.max(r[i])//Math.sqrt(citymap[city].population) * 100
         });
         //lng = lng.reverse();
-        //cityCircle.addListener('click', showNewRect);
+        cityCircle.addListener('click', showNewRect);
 
         var maxRect = Math.max(r[i])/1000;
 
