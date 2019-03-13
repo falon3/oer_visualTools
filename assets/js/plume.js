@@ -184,7 +184,6 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var z_num; //convert z from the word decription to a number
         if (z=="plume") z_num = H;
         else if (z=="ground") z_num=0;
-
         var olat = latitude;
         var olon = longitude;
         var rotation_angle_degs = wd;

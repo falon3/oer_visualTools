@@ -100,8 +100,7 @@ function initPlot() {
     // cdes5 30, 160, 1100
     // color of triangle, word to display, area with so much μg/m^3 concentration for each section
     make_plot( Us, H); //yellow
-    make_plot( Us, H);
-    make_plot( Us, H); //1100
+    
 }
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +201,6 @@ function make_plot(Us, H) {
                         else { //after plume hits the ground)   
                             c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
                        }
-                       console.log(c);
                        //console.log(['',x[i],z[i], c]);
                        if (c==0 && z[j]>H) continue;
                        if (c!=0) to_plot.push(['',x[i],z[j], c]);
@@ -222,13 +220,23 @@ function make_plot(Us, H) {
                //      break;   
                //  }
         }
-        console.log("HERE");
+        //console.log("HERE");
         google.charts.load("current", {packages:["corechart"]});
-      google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(drawChart);
+
+
+        // var dataArray = convertToArray(x,y);
+        // Plotly.newPlot('graph',dataArray);
       
       
     }
 };
+
+// function convertToArray(xx,yy){
+
+//     var data = [{x:xdata. y:ydata, type:'histogram2dcontour'}]
+// }
+
 // before plume hit's the ground
 function C_eq1(Q, sigy, sigz, Us, y, z, H) {
         var base = Q/(2*3.1416*sigy*sigz*Us); 
