@@ -33,6 +33,7 @@ var defaults = {
   "Pa": 1032
 };       
 
+var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
 
 //SETUP Globals
 var wd = defaults["wd"];
@@ -48,7 +49,7 @@ var ds = defaults["ds"];
 var Ts = defaults["Ts"];
 var Ta = defaults["Ta"];
 var Pa = defaults["Pa"];
-
+var chart; 
 
 var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
 // P is function of atmospheric stability (A to F) 
@@ -99,6 +100,8 @@ function initPlot() {
     var H = h + deltaH;
     // cdes5 30, 160, 1100
     // color of triangle, word to display, area with so much μg/m^3 concentration for each section
+
+    
     make_plot( Us, H); //yellow
     
 }
@@ -106,11 +109,14 @@ function initPlot() {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function make_plot(Us, H) {
     with (Math) {
+
+        
+
                  // var xx, yy, r, ct, st, angle;
         var RADIANS =57.2957795;
         var yn = [];
         var sigyn =[];
-
+        to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
 
         // if (t2)
         var u = 5//Math.floor(Math.random() * 20);//m/s 
@@ -120,7 +126,7 @@ function make_plot(Us, H) {
     //x = [10, 100, 1000, 5000, 10000];
         var x = [0, 10, 20];
         var z = [0, 5];
-        var Zmax = 400;
+        var Zmax = 500;
         var y = 0;
         var k = 1;
         while (x[k] < Xmax-10){
@@ -225,8 +231,8 @@ function make_plot(Us, H) {
         google.charts.setOnLoadCallback(drawChart);
 
 
-        // var dataArray = convertToArray(x,y);
-        // Plotly.newPlot('graph',dataArray);
+//         var dataArray = convertToArray(x,y);
+//         Plotly.newPlot('graph',dataArray);
       
       
     }
@@ -260,11 +266,15 @@ function C_eq2(Q, sigy, sigz, Us, y, z, H) {
 };
 
 function drawChart() {
+        if (chart){
+            console.log(chart);
+            chart = chart.clearChart();
+        }
         var data = google.visualization.arrayToDataTable(to_plot);
 
         var options = {
-          colorAxis: {colors: ['yellow', 'red'], maxValue: 200, minValue:5},
-          sizeAxis: {minSize:3, minValue:0, maxSize:3},
+          colorAxis: {colors: ['yellow', 'red'], maxValue: 250, minValue:5},
+          sizeAxis: {minSize:5, minValue:0, maxSize:5},
             hAxis: {title: 'X'},
             vAxis: {title: 'Z', viewWindowMode: 'pretty'},
             sortBubblesBySize: false,
@@ -272,37 +282,96 @@ function drawChart() {
             chartArea:{width:'80%',height:'80%'}
         };
 
+        
 
-        var chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
+        chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
         chart.draw(data, options);
       }
             
-        
+    
+    //set and display defaults for sliders
+function setSliderValues(sliders){
+    for (i in sliders){
+        $("#"+sliders[i]+"Range").val(defaults[sliders[i]]);
+        //$("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
+        $("#"+sliders[i]+"Out").val(defaults[sliders[i]]);
+    }
+}
+
+$( function() {
+    $( "#slider-range" ).slider({
+      range: true,
+      min: 2,
+      max: 500,
+      values: [ 5, 100 ],
+      slide: function( event, ui ) {
+        $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] ); 
+        var levels = Object.keys(polution_levels);   
+        var vmin = ui.values[ 0 ];
+        var vmax = ui.values[ 1 ];
+        var multiplier = Math.floor((vmax-vmin)/(levels.length+1));
+        for (var i=0; i<levels.length/2 ;i++){
+             polution_levels[i]['level']=vmin+(i*multiplier);
+        }
+        for (var i=levels.length-1, j=0; i>=levels.length/2; i--){
+             polution_levels[i]['level']=vmax-(j*multiplier);
+             j = j+1;
+        }
+        drawNewMap();
+        }
+    });
+    $( "#amount" ).val( $( "#slider-range" ).slider( "values", 0 ) +
+      " - " + $( "#slider-range" ).slider( "values", 1 )); // initially
+  });
+
 
 $( document ).ready(function() {
+
+    setSliderValues(all_sliders);
     initPlot();
     console.log( "ready!" );
     // Update from user input changes
-    $("#ws").on('change', function(){
+    $("input[name='ws']").on('change', function(){
         ws = parseInt($(this).val());
         initPlot();
     });
-    $("#Q").on('change', function(){
+    $("input[name='Q']").on('change', function(){
         Q = parseInt($(this).val());
         initPlot();
     });
-    $("#wd").on('change', function(){
-        wd = $(this).val();
-        initPlot();
-    });
-    $("#h").on('change', function(){
+    $("input[name='h']").on('change', function(){
         h = parseInt($(this).val());
         initPlot();
     });
-    $("#xRange").on('change', function(){
+    $("input[name='Xmax']").on('change', function(){
         Xmax = $(this).val();
         initPlot();
     });
+    $("input[name='Z1']").on('change', function(){
+        Z1 = $(this).val();
+        initPlot();
+    });
+    $("input[name='Vs']").on('change', function(){
+        Vs = $(this).val();
+        initPlot();
+    });
+    $("input[name='ds']").on('change', function(){
+        ds = $(this).val();
+        initPlot();
+    });
+    $("input[name='Ts']").on('change', function(){
+        Ts = $(this).val();
+        initPlot();
+    });
+    $("input[name='Ta']").on('change', function(){
+        Ta = $(this).val();
+        initPlot();
+    });
+    $("input[name='Pa']").on('change', function(){
+        Pa = $(this).val();
+        initPlot();
+    });
+     
     $("#sclass").on('change', function(){
         var cl = $(this).val();
         var sloc = $("#sloc").val();
@@ -317,29 +386,65 @@ $( document ).ready(function() {
         //console.log(sc);
         initPlot();
     });
-    $("#Z1").on('change', function(){
-        Z1 = $(this).val();
-        initPlot();
-    });
-    $("#Vs").on('change', function(){
-        Vs = $(this).val();
-        initPlot();
-    });
-    $("#ds").on('change', function(){
-        ds = $(this).val();
-        initPlot();
-    });
-    $("#Ts").on('change', function(){
-        Ts = $(this).val();
-        initPlot();
-    });
-    $("#Ta").on('change', function(){
-        Ta = $(this).val();
-        initPlot();
-    });
-    $("#Pa").on('change', function(){
-        Pa = $(this).val();
-        initPlot();
-    });
+
+    // Update from user input changes
+    // $("#ws").on('change', function(){
+    //     ws = parseInt($(this).val());
+    //     initPlot();
+    // });
+    // $("#Q").on('change', function(){
+    //     Q = parseInt($(this).val());
+    //     initPlot();
+    // });
+    // $("#wd").on('change', function(){
+    //     wd = $(this).val();
+    //     initPlot();
+    // });
+    // $("#h").on('change', function(){
+    //     h = parseInt($(this).val());
+    //     initPlot();
+    // });
+    // $("#xRange").on('change', function(){
+    //     Xmax = $(this).val();
+    //     initPlot();
+    // });
+    // $("#sclass").on('change', function(){
+    //     var cl = $(this).val();
+    //     var sloc = $("#sloc").val();
+    //     sc = sloc+cl;
+    //     //console.log(sc);
+    //     initPlot();
+    // });
+    // $("#sloc").on('change', function(){
+    //     var sloc = $(this).val();
+    //     var cl = $("#sclass").val();
+    //     sc = sloc+cl;
+    //     //console.log(sc);
+    //     initPlot();
+    // });
+    // $("#Z1").on('change', function(){
+    //     Z1 = $(this).val();
+    //     initPlot();
+    // });
+    // $("#Vs").on('change', function(){
+    //     Vs = $(this).val();
+    //     initPlot();
+    // });
+    // $("#ds").on('change', function(){
+    //     ds = $(this).val();
+    //     initPlot();
+    // });
+    // $("#Ts").on('change', function(){
+    //     Ts = $(this).val();
+    //     initPlot();
+    // });
+    // $("#Ta").on('change', function(){
+    //     Ta = $(this).val();
+    //     initPlot();
+    // });
+    // $("#Pa").on('change', function(){
+    //     Pa = $(this).val();
+    //     initPlot();
+    // });
 
 });
