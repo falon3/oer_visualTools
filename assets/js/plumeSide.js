@@ -274,7 +274,7 @@ function drawChart() {
 
         var options = {
           colorAxis: {colors: ['yellow', 'red'], maxValue: 250, minValue:5},
-          sizeAxis: {minSize:5, minValue:0, maxSize:5},
+          sizeAxis: {minSize:7, minValue:0, maxSize:7},
             hAxis: {title: 'X'},
             vAxis: {title: 'Z', viewWindowMode: 'pretty'},
             sortBubblesBySize: false,
