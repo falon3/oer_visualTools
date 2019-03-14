@@ -9,19 +9,16 @@
           src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
     <script type="text/javascript" 
           src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
-    <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>    
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="assets/js/plotly-latest.min.js"></script>
-
     <script type='text/javascript' src="config/formulas.js"></script>
     <script type='text/javascript' src="assets/js/plumeSide.js"></script>
-    </script>
-
     
+    <link rel="stylesheet" href="assets/css/jquery-ui.min.css">
+  
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Polygon Arrays</title>
+    <title>Plume Side View</title>
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -33,8 +30,8 @@
         position: absolute;
         height: 100%;
         width: 65%;
-        top:0;
-        left:0;
+        top:10px;
+        left:0px;
         box-sizing: border-box;
         padding: 10px;
         overflow-x: scroll;
@@ -73,6 +70,13 @@
       label{
         font-weight: bold;
       }
+        .concentration {
+            position: absolute;
+            left: 25%;
+            top:5px;
+          z-index: 10;
+          background-color: white;
+        }
     </style>
 
   </head>
@@ -81,6 +85,14 @@
 
     <div id="container">
         <div id="chart_div""></div>
+            <div class='concentration'>
+            
+          <label for="amount">Concentration range:</label>
+          <input type="text" id="amount" readonly style="width: 100px; font-size:medium; border:0; color: #2c2d2c; font-weight:bold;">
+           <br>
+         
+        <div style = "margin-top:5px;" id="slider-range"></div>
+      </div>
         <div id="data">
        <label>Q: Source strength of Contaminant = <input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input> μg/s</label><br>
        <input class="userdata" name="Q" type="range"  id="QRange" min="1000000" max="80000000" oninput="QOut.value = QRange.value"><br>

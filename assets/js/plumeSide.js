@@ -30,7 +30,9 @@ var defaults = {
   "ds": 2,
   "Ts": 400,
   "Ta": 283,
-  "Pa": 1032
+  "Pa": 1032,
+  "Cmin" : 5,
+  "Cmax": 250
 };       
 
 var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
@@ -49,6 +51,8 @@ var ds = defaults["ds"];
 var Ts = defaults["Ts"];
 var Ta = defaults["Ta"];
 var Pa = defaults["Pa"];
+var Cmin = defaults["Cmin"];
+var Cmax = defaults["Cmax"];
 var chart;
 var Zmax = 500; 
 
@@ -121,7 +125,7 @@ function make_plot(Us, H) {
              x.push(x[k]+10);  
              k=k+1;
         }
-        Zmax = 400;
+        Zmax = H+300;
         var z = [0, 5];
         var k = 1;
         while (z[k] < Zmax-1){
@@ -262,14 +266,14 @@ function drawChart() {
         var data = google.visualization.arrayToDataTable(to_plot);
 
         var options = {
-          colorAxis: {colors: ['yellow', 'red'], maxValue: 250, minValue:5},
+          colorAxis: {colors: ['yellow', 'red'], maxValue: Cmax, minValue: Cmin},
           sizeAxis: {minSize:7, minValue:0, maxSize:7},
             hAxis: {title: 'X (meters)', maxValue:Math.max(500, Xmax)},
-            vAxis: {title: 'Z (meters)', maxValue:Math.max(400, Zmax)},
+            vAxis: {title: 'Z (meters)', viewWindowMode:'pretty'},//maxValue:Math.max(400, Zmax)},
             sortBubblesBySize: false,
             bubble: {opacity: 0.6},
-            chartArea:{width:'85%',height:'80%'},
-           width: Math.max(800,Xmax*0.60),
+            chartArea:{width:'80%',height:'80%'},
+           width: Math.max(900,Xmax*0.60),
            height: Math.max(700, Zmax*2)
         };
 
@@ -292,23 +296,17 @@ function setSliderValues(sliders){
 $( function() {
     $( "#slider-range" ).slider({
       range: true,
-      min: 2,
-      max: 500,
-      values: [ 5, 100 ],
+      min: 1,
+      max: 800,
+      values: [ Cmin, Cmax ],
       slide: function( event, ui ) {
-        $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] ); 
-        var levels = Object.keys(polution_levels);   
-        var vmin = ui.values[ 0 ];
-        var vmax = ui.values[ 1 ];
-        var multiplier = Math.floor((vmax-vmin)/(levels.length+1));
-        for (var i=0; i<levels.length/2 ;i++){
-             polution_levels[i]['level']=vmin+(i*multiplier);
-        }
-        for (var i=levels.length-1, j=0; i>=levels.length/2; i--){
-             polution_levels[i]['level']=vmax-(j*multiplier);
-             j = j+1;
-        }
-        drawNewMap();
+        $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] );   
+        
+        },
+        change: function( event, ui ){
+            Cmin = ui.values[ 0 ];
+            Cmax = ui.values[ 1 ];
+            drawChart();
         }
     });
     $( "#amount" ).val( $( "#slider-range" ).slider( "values", 0 ) +

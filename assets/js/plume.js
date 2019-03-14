@@ -615,6 +615,8 @@ $( function() {
       values: [ 5, 100 ],
       slide: function( event, ui ) {
         $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] ); 
+        },
+      change: function( event, ui ){
         var levels = Object.keys(polution_levels);   
         var vmin = ui.values[ 0 ];
         var vmax = ui.values[ 1 ];
