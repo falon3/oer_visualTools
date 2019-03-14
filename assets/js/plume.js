@@ -226,67 +226,6 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         var final_y = [];
         var latLng = {};
         var blatLng = {};
-
-        //OLLLDDDDDDDDDDDD?????????????????????.///////////////
-
-        // var lat = [];
-        // var lng = [];
-        // var blattt = [];
-        // var blonnn = [];
-        // var lattt = [];
-        // var lonnn = [];
-        // xx = [];
-        // xx1 =[];
-        // yy = [];
-        // yy1 = [];
-        // r1 =[];
-        // ct = [];
-        // ct1 =[];
-        // st = [];
-        // st1 =[];
-        // xxx = [];
-        // xxx1 = [];
-        // yyy = [];
-        // yyy1 = [];
-        // d2rlon = [];
-        // d2rlat1 = [];
-        // d2rlat = [];
-        // d2rlon1 =[];
-        // plon = [];
-        // plon1 =[];
-        // plat = [];
-        // plat1 = [];
-        // angle =[0];
-        // angle1 =[0];
-        // var u = 5;
-        // var all = {};
-        // var sigy =[];
-        // var sigy1 =[];
-        // var sigz =[];
-        // var sigz1 =[];
-        // var ccen =[];
-        // var ccen1 =[];
-        // var cdes5 = zone;//160; //ppm
-        // var y5 = [];
-        // var y51 = [];
-        // var ynew1 =[];
-        // var latLng1 = [];
-        // var lattt = [];
-        // var lonnn =[];
-        // var latLng = {};
-        // var lat2 =[];
-        // var lng2 = [];
-        // var latt = [];
-        // var lonn =[];
-        // var lat0 =[];
-        // var lng0 = [];
-        // var blatt = [];
-        // var blonn = [];
-        // var blattt = [];
-        // var blonnn = [];
-        // if (t2)
-        
-        //////END OLD?????????????????///////////////
         
         for (i in x){
                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
@@ -357,15 +296,9 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         //console.log(ynew);
         for (i in final_y){
             //if (ynew[i]>=0){ // for half ellipticals
-            ///////NEWWWWWWWWWWWWWW////////////////////
                 var yy = final_y[i];
                 var y_left = -final_y[i];
                 var xx = final_x[i];
-
-
-                // var yy = ynew[i] - yoffset;
-                // var y_left = -(ynew[i] - yoffset);
-                // var xx = x[i] - xoffset;
                 var coords_right = xy_to_latlon(xx, yy, olon, olat, rotation_angle_degs, xoffset, yoffset);
                 var coords_left = xy_to_latlon(xx, y_left, olon, olat, rotation_angle_degs, xoffset, yoffset);
                 lat0[i]=coords_right.lat;
@@ -374,9 +307,7 @@ function translate_coordinates(strokeColor, zone, Us, H) {
                 lng1[i]=coords_left.lng;
                 r[i] = sqrt(xx*xx + yy*yy);
 
-
                 if (bounce_y.indexOf(final_x[i]) != -1){
-                //if (bounce_y.indexOf(x[i]) != -1){
                     blat0[i] =lat0[i];
                     blng0[i] = lng0[i];
                     blat1[i]=lat1[i];
@@ -390,79 +321,9 @@ function translate_coordinates(strokeColor, zone, Us, H) {
         blattt = blat0.reverse().concat(blat1);
         blonnn = blng0.reverse().concat(blng1);
 
-        ////////////NEWWWWWWWWWWWWWWWWWWWWW///////////////////
-
-        // //     ///OLD//////////////////////
-        //     xx[i] = x[i] - xoffset;
-        //     //console.log(xx)
-        //     yy[i] = ynew[i] - yoffset;
-        //     //console.log(yy)
-        //     angle[i] = wd / RADIANS;//rotation_angle_degs/ RADIANS;
-        //     r[i] = sqrt(xx[i] * xx[i] + yy[i] * yy[i]);
-        //     //console.log(r[i])
-        //     ct[i] = xx[i] / r[i];
-        //     st[i] = yy[i] / r[i];
-        //     xxx[i] = r[i] * ((ct[i] * cos(angle[i])) + (st[i] * sin(angle[i])));
-        //     yyy[i] = r[i] * ((st[i] * cos(angle[i])) - (ct[i] * sin(angle[i])));
-        //     d2rlat[i] = olat/RADIANS;
-        //     d2rlon[i] = (111415.13 * cos(d2rlat[i])) - (94.55 * cos(3.0 * d2rlat[i])) + (0.12 * cos(5.0 * d2rlat[i]));
-        //     d2rlat[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat[i])) + (1.20 * cos(4.0 * d2rlat[i])) - (0.002 * cos(6.0 * d2rlat[i])));
-        //     //console.log(d2rlat);
-        //     // console.log(d2rlon);
-        //     plon[i] = olon + xxx[i] / d2rlon[i];
-        //     plat[i] = olat + yyy[i] / d2rlat[i];
-
-
-        //     xx1[i] = x[i] - xoffset;
-        //     yy1[i] = -ynew[i] - yoffset;
-        //     angle1[i] = wd / RADIANS; //rotation_angle_degs/ RADIANS;
-        //     r1[i] = sqrt(xx1[i] * xx1[i] + yy1[i] * yy1[i]);
-        //     ct1[i] = xx1[i] / r1[i];
-        //     st1[i] = yy1[i] / r1[i];
-        //     xxx1[i] = r1[i] * ((ct1[i] * cos(angle1[i])) + (st1[i] * sin(angle1[i])));
-        //     yyy1[i] = r1[i] * ((st1[i] * cos(angle1[i])) - (ct1[i] * sin(angle1[i])));
-        //     d2rlat1[i] = olat/RADIANS;
-        //     d2rlon1[i] = (111415.13 * cos(d2rlat1[i])) - (94.55 * cos(3.0 * d2rlat1[i])) + (0.12 * cos(5.0 * d2rlat1[i]));
-        //     d2rlat1[i] = (111132.09 - (566.05 * cos(2.0 * d2rlat1[i])) + (1.20 * cos(4.0 * d2rlat1[i])) - (0.002 * cos(6.0 * d2rlat1[i])));
-
-        //     plon1[i] = olon + xxx1[i] / d2rlon1[i];
-        //     plat1[i] = olat + yyy1[i] / d2rlat1[i];
-        
-
-            
-        //     lat0[i] =plat[i];
-        //     lng0[i] = plon[i];
-        //     lat1[i]=plat1[i]
-        //     lng1[i] = plon1[i] 
-        //     if (bounce_y.indexOf(ynew[i]) != -1){
-        //         blat0[i] =lat0[i];
-        //         blng0[i] = lng0[i];
-        //         blat1[i]=lat1[i];
-        //         blng1[i] = lng1[i];
-        //     } 
-
-
-        // };
-        // latt = lat0.reverse();
-        // lonn = lng0.reverse();
-        // lattt = latt.concat(lat1);
-        // lonnn = lonn.concat(lng1);
-
-        // console.log("LATTTT:", lattt);
-        // console.log("LONNN:", lonnn);
-        // blatt = blat0.reverse();
-        // blonn = blng0.reverse();//.reverse();
-        // blattt = blatt.concat(blat1);
-        // blonnn = blonn.concat(blng1);
-
-        /////ENDOLDDDD///////////////////////////////////
-        
-
         var cityCircle = new google.maps.Circle({
             strokeColor: strokeColor,
             strokeOpacity: 0.3,
-             // strokeWeight: 2,
-              //fillColor: '#FF0000',
             fillOpacity: 0,
             map: map,
             center: {lat:latitude, lng: longitude},

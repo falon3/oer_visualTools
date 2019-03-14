@@ -1,11 +1,7 @@
 
-
-//      "wd" is wind direction, 
-//     "ws" is wind speed from meteorological tower, [Uref]
 //     "Q" is amount of material released, [source strength of contaminant I, μg/s]
 //     "mw" is molecular weight, 
 //     "sc" is stability class and 
-//     "lat","lon" are latitude and longitude respectively.
 //      "h" is physical height of the stack
 //      Xmax is the max range of distance from plume to assess
 //      Z1 is height of meteorological tower
@@ -15,10 +11,7 @@
 //      "Ta": temp of the atmosphere at stack outlet (K)
 //      "Pa": atmospheric pressure at ground level (mb)
 
-
-
-var defaults = {
-  "wd": 90, // it's wd-90 
+var defaults = { 
   "ws":5,
   "Q": 25000000,
   "mw": 17,
@@ -38,7 +31,6 @@ var defaults = {
 var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
 
 //SETUP Globals
-var wd = defaults["wd"];
 var ws = defaults["ws"];
 var Q = defaults["Q"];
 var mw = defaults["mw"];
@@ -98,16 +90,11 @@ function calculateDeltaH(Us){
 
 
 function initPlot() {
-    //setTimeout(initMap,10000)
-    //var a = Math.floor(Math.random() * 180);
     var Us = calculateUs();
     var deltaH = calculateDeltaH(Us);
     var H = h + deltaH;
-    // cdes5 30, 160, 1100
-    // color of triangle, word to display, area with so much μg/m^3 concentration for each section
 
-    
-    make_plot( Us, H); //yellow
+    make_plot( Us, H);
     
 }
 
@@ -143,12 +130,7 @@ function make_plot(Us, H) {
         var y51 = [];
         var ynew1 =[];
       
-        //to_plot = [];
         for (i in x){
-
-                //d2rlat[i] =d2rlat ;
-                //x[i] = count;
-
                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
                 if (sc=="ra") {
                  sigy[i] = 0.22*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
@@ -192,7 +174,6 @@ function make_plot(Us, H) {
                   }
                   //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
                     //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
-                   //console.log(ccen[i])
 
                     for (j in z){
                        if (sigz[i]<(H/2.15)){
@@ -211,36 +192,16 @@ function make_plot(Us, H) {
                    //          bounce_y.push(y5[i], -y5[i]);
                    //      }
                    
-                   
-               // while(isNaN(y5[i])==false){
-               //      var c = i+1;
-               //      ynew1 = y5.slice(0,c);
-               //      ynew2 = yn.slice(0,c);
-               //      ynew = ynew1.concat(yn);
-               //      break;   
-               //  }
         }
         //console.log("HERE");
         google.charts.load("current", {packages:["corechart"]});
         google.charts.setOnLoadCallback(drawChart);
 
-
-//         var dataArray = convertToArray(x,y);
-//         Plotly.newPlot('graph',dataArray);
-      
-      
     }
 };
-
-// function convertToArray(xx,yy){
-
-//     var data = [{x:xdata. y:ydata, type:'histogram2dcontour'}]
-// }
-
 // before plume hit's the ground
 function C_eq1(Q, sigy, sigz, Us, y, z, H) {
         var base = Q/(2*3.1416*sigy*sigz*Us); 
-        //console.log(-0.5*(Math.pow((z-H)/sigz,2)));
         c = base*Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))));
         if (c<5 || isNaN(c)==true){
             c = 0;
@@ -276,8 +237,6 @@ function drawChart() {
            width: Math.max(900,Xmax*0.60),
            height: Math.max(700, Zmax*2)
         };
-
-        
 
         chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
         chart.draw(data, options);
@@ -375,65 +334,5 @@ $( document ).ready(function() {
         //console.log(sc);
         initPlot();
     });
-
-    // Update from user input changes
-    // $("#ws").on('change', function(){
-    //     ws = parseInt($(this).val());
-    //     initPlot();
-    // });
-    // $("#Q").on('change', function(){
-    //     Q = parseInt($(this).val());
-    //     initPlot();
-    // });
-    // $("#wd").on('change', function(){
-    //     wd = $(this).val();
-    //     initPlot();
-    // });
-    // $("#h").on('change', function(){
-    //     h = parseInt($(this).val());
-    //     initPlot();
-    // });
-    // $("#xRange").on('change', function(){
-    //     Xmax = $(this).val();
-    //     initPlot();
-    // });
-    // $("#sclass").on('change', function(){
-    //     var cl = $(this).val();
-    //     var sloc = $("#sloc").val();
-    //     sc = sloc+cl;
-    //     //console.log(sc);
-    //     initPlot();
-    // });
-    // $("#sloc").on('change', function(){
-    //     var sloc = $(this).val();
-    //     var cl = $("#sclass").val();
-    //     sc = sloc+cl;
-    //     //console.log(sc);
-    //     initPlot();
-    // });
-    // $("#Z1").on('change', function(){
-    //     Z1 = $(this).val();
-    //     initPlot();
-    // });
-    // $("#Vs").on('change', function(){
-    //     Vs = $(this).val();
-    //     initPlot();
-    // });
-    // $("#ds").on('change', function(){
-    //     ds = $(this).val();
-    //     initPlot();
-    // });
-    // $("#Ts").on('change', function(){
-    //     Ts = $(this).val();
-    //     initPlot();
-    // });
-    // $("#Ta").on('change', function(){
-    //     Ta = $(this).val();
-    //     initPlot();
-    // });
-    // $("#Pa").on('change', function(){
-    //     Pa = $(this).val();
-    //     initPlot();
-    // });
 
 });
