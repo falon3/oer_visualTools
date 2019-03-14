@@ -83,7 +83,7 @@
         <div id="chart_div""></div>
         <div id="data">
        <label>Q: Source strength of Contaminant = <input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input> μg/s</label><br>
-       <input class="userdata" name="Q" type="range"  id="QRange" min="1000000" max="500000000" oninput="QOut.value = QRange.value"><br>
+       <input class="userdata" name="Q" type="range"  id="QRange" min="1000000" max="80000000" oninput="QOut.value = QRange.value"><br>
 
        <label>ws: Wind Speed from Meteorological Tower = <input name="ws" class="sliderout" id="wsOut" style="width:40px;" oninput="wsRange.value=wsOut.value"></input> m/s</label><br>
        <input class="userdata" name="ws" type="range"  id="wsRange"  min="0" max="60" oninput="wsOut.value = wsRange.value"><br>   
@@ -110,7 +110,7 @@
        <input class="userdata" name="Ta" type="range"  id="TaRange" min="200" max="500" oninput="TaOut.value = TaRange.value"><br>
 
        <label>X: Max distance X from stack = <input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> m</label><br>  
-       <input class="userdata" type="range" name="Xmax" id="XmaxRange" min="100" max="20000" oninput="XmaxOut.value = XmaxRange.value"><br>
+       <input class="userdata" type="range" name="Xmax" id="XmaxRange" min="100" max="8000" oninput="XmaxOut.value = XmaxRange.value"><br>
        <label>sc: Stability Class</label><br>
        <select id="sclass">
           <option value="d">D</option>

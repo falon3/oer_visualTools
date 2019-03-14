@@ -49,7 +49,8 @@ var ds = defaults["ds"];
 var Ts = defaults["Ts"];
 var Ta = defaults["Ta"];
 var Pa = defaults["Pa"];
-var chart; 
+var chart;
+var Zmax = 500; 
 
 var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
 // P is function of atmospheric stability (A to F) 
@@ -109,30 +110,19 @@ function initPlot() {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function make_plot(Us, H) {
     with (Math) {
-
-        
-
                  // var xx, yy, r, ct, st, angle;
         var RADIANS =57.2957795;
-        var yn = [];
-        var sigyn =[];
         to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
+        var y = 0; // sideview from y=0
 
-        // if (t2)
-        var u = 5//Math.floor(Math.random() * 20);//m/s 
-    //var u = //Math.floor(Math.random() * 20);//m/s
-    //var Q = mat//10000//Math.floor(Math.random() * 1000);
-        RADIANS = 57.2957795;
-    //x = [10, 100, 1000, 5000, 10000];
-        var x = [0, 10, 20];
-        var z = [0, 5];
-        var Zmax = 500;
-        var y = 0;
-        var k = 1;
+        var x = [0, 5, 10];           
+        var k = 2;
         while (x[k] < Xmax-10){
              x.push(x[k]+10);  
              k=k+1;
         }
+        Zmax = 400;
+        var z = [0, 5];
         var k = 1;
         while (z[k] < Zmax-1){
              z.push(z[k]+5);  
@@ -208,7 +198,7 @@ function make_plot(Us, H) {
                             c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
                        }
                        //console.log(['',x[i],z[i], c]);
-                       if (c==0 && z[j]>H) continue;
+                       if (c==0 && z[j]>H) continue; // more than half skip the empty zone
                        if (c!=0) to_plot.push(['',x[i],z[j], c]);
                           
                     }
@@ -267,7 +257,6 @@ function C_eq2(Q, sigy, sigz, Us, y, z, H) {
 
 function drawChart() {
         if (chart){
-            console.log(chart);
             chart = chart.clearChart();
         }
         var data = google.visualization.arrayToDataTable(to_plot);
@@ -275,13 +264,13 @@ function drawChart() {
         var options = {
           colorAxis: {colors: ['yellow', 'red'], maxValue: 250, minValue:5},
           sizeAxis: {minSize:7, minValue:0, maxSize:7},
-            hAxis: {title: 'X'},
-            vAxis: {title: 'Z', viewWindowMode: 'pretty', maxValue:500},
+            hAxis: {title: 'X (meters)', maxValue:Math.max(500, Xmax)},
+            vAxis: {title: 'Z (meters)', maxValue:Math.max(400, Zmax)},
             sortBubblesBySize: false,
             bubble: {opacity: 0.6},
-            chartArea:{width:'80%',height:'80%'},
-           width: 1000,
-           height: 700
+            chartArea:{width:'85%',height:'80%'},
+           width: Math.max(800,Xmax*0.60),
+           height: Math.max(700, Zmax*2)
         };
 
         
