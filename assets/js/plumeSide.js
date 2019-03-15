@@ -106,17 +106,21 @@ function make_plot(Us, H) {
         to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
         var y = 0; // sideview from y=0
 
-        var x = [0, 5, 10];           
+        var x = [0,1,2]//[0, 5, 10];           
         var k = 2;
-        while (x[k] < Xmax-10){
-             x.push(x[k]+10);  
+        while (x[k] < Xmax-1){
+             x.push(x[k]+1);  
              k=k+1;
         }
-        Zmax = H+300;
-        var z = [0, 5];
+        // while (x[k] < Xmax-10){
+        //      x.push(x[k]+10);  
+        //      k=k+1;
+        // }
+        Zmax = Math.floor(H+300);
+        var z = [0, 1]; //[0,5] put backkkk
         var k = 1;
         while (z[k] < Zmax-1){
-             z.push(z[k]+5);  
+             z.push(z[k]+1);  //z.push(z[k]+5) put backkkkkk
              k=k+1;
         }
 
@@ -129,6 +133,8 @@ function make_plot(Us, H) {
         var y5 = [];
         var y51 = [];
         var ynew1 =[];
+
+        var z_rows = {}; // for other plot
       
         for (i in x){
                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
@@ -175,6 +181,7 @@ function make_plot(Us, H) {
                   //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
                     //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
 
+                    var keys = Object.keys(z_rows);
                     for (j in z){
                        if (sigz[i]<(H/2.15)){
                             c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
@@ -183,8 +190,20 @@ function make_plot(Us, H) {
                             c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
                        }
                        //console.log(['',x[i],z[i], c]);
-                       if (c==0 && z[j]>H) continue; // more than half skip the empty zone
-                       if (c!=0) to_plot.push(['',x[i],z[j], c]);
+                       rev_index = z.length-j-1;
+                       //console.log(i, keys.indexOf(rev_index.toString()));
+                       if (z_rows[rev_index]) { // after first pass lists should all exist
+                            //console.log("passed!", z_rows);
+                            z_rows[rev_index] = z_rows[rev_index].concat([c]);
+                       }
+                       else{
+                             z_rows[rev_index] = [c];
+                       }
+                       
+
+                       //PUT BACLKKKKKKK
+                       // if (c==0 && z[j]>H) continue; // more than half skip the empty zone
+                       // if (c!=0) to_plot.push(['',x[i],z[j], c]);
                           
                     }
                    // keep track of the line where the plume hits ground
@@ -193,9 +212,54 @@ function make_plot(Us, H) {
                    //      }
                    
         }
+        var data_contour = [];
+        for (i in x){
+            if (z_rows[i]){
+                data_contour = data_contour.concat(z_rows[i]);
+            }
+        }
+        var d = {"width":x.length, "height":z.length, "values":data_contour};
+        //console.log(JSON.stringify({"width":x.length, "height":z.length, "values":data_contour}));
+        var dataJson = JSON.stringify(d);
+        //console.log(data_contour);
+            var i0 = d3.interpolateHsvLong(d3.hsv(120, 1, 0.65), d3.hsv(60, 1, 0.90)),
+            i1 = d3.interpolateHsvLong(d3.hsv(60, 1, 0.90), d3.hsv(0, 0, 0.95)),
+            interpolateTerrain = function(t) { return t < 0.5 ? i0(t * 2) : i1((t - 0.5) * 2); },
+            color = d3.scaleSequential(interpolateTerrain).domain([90, 190]);
+            do_it(dataJson);
+
+            function do_it(volcano) {
+                //var old = d3.select("canvas").getContext('2d');
+                //old.clearRect(0, 0, canvas.width, canvas.height);
+
+                volcano = JSON.parse(volcano);
+                  var n = volcano.width,
+                      m = volcano.height;
+
+                  var canvas = d3.select("canvas")
+                      .attr("width", n)
+                      .attr("height", m);
+
+                  var context = canvas.node().getContext("2d"),
+                      image = context.createImageData(n, m);
+
+                  for (var j = 0, k = 0, l = 0; j < m; ++j) {
+                    for (var i = 0; i < n; ++i, ++k, l += 4) {
+                      var c = d3.rgb(color(volcano.values[k]));
+                      image.data[l + 0] = c.r;
+                      image.data[l + 1] = c.g;
+                      image.data[l + 2] = c.b;
+                      image.data[l + 3] = 255;
+                    }
+                  }
+
+                  context.putImageData(image, 0, 0);
+            };
+
+        ////PUT BACKKKK
         //console.log("HERE");
-        google.charts.load("current", {packages:["corechart"]});
-        google.charts.setOnLoadCallback(drawChart);
+        // google.charts.load("current", {packages:["corechart"]});
+        // google.charts.setOnLoadCallback(drawChart);
 
     }
 };
