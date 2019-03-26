@@ -112,7 +112,7 @@ function make_plot(Us, H) {
              x.push(x[k]+10);  
              k=k+1;
         }
-        Zmax = H+300;
+        Zmax = H+350;
         var z = [0, 5];
         var k = 1;
         while (z[k] < Zmax-1){
@@ -203,7 +203,7 @@ function make_plot(Us, H) {
 function C_eq1(Q, sigy, sigz, Us, y, z, H) {
         var base = Q/(2*3.1416*sigy*sigz*Us); 
         c = base*Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))));
-        if (c<5 || isNaN(c)==true){
+        if (c<1 || isNaN(c)==true){
             c = 0;
         }
     return c;
@@ -214,7 +214,7 @@ function C_eq2(Q, sigy, sigz, Us, y, z, H) {
         var base = Q/(2*3.1416*sigy*sigz*Us); 
         c = base*(Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))))
                   +Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z+H)/sigz,2)))));
-        if (c<5 || isNaN(c)==true){
+        if (c<1 || isNaN(c)==true){
             c = 0;
         }
     return c;
@@ -224,16 +224,21 @@ function drawChart() {
         if (chart){
             chart = chart.clearChart();
         }
-        var data = google.visualization.arrayToDataTable(to_plot);
+        var filtered = to_plot.filter(function(value, index, arr){
+            return arr[index][3] >= Cmin;
+            });
+        filtered.unshift([ 'ID', 'X', 'Z', 'Concentration']);
+        var data = google.visualization.arrayToDataTable(filtered);
 
         var options = {
           colorAxis: {colors: ['yellow', 'red'], maxValue: Cmax, minValue: Cmin},
           sizeAxis: {minSize:7, minValue:0, maxSize:7},
             hAxis: {title: 'X (meters)', maxValue:Math.max(500, Xmax)},
-            vAxis: {title: 'Z (meters)', viewWindowMode:'pretty'},//maxValue:Math.max(400, Zmax)},
+            vAxis: {title: 'Z (meters)', maxValue:Math.max(300, Zmax), viewWindowMode:'pretty'},//maxValue:Math.max(400, Zmax)},
             sortBubblesBySize: false,
             bubble: {opacity: 0.6},
             chartArea:{width:'80%',height:'80%'},
+            explorer: { keepInBounds: true },
            width: Math.max(900,Xmax*0.60),
            height: Math.max(700, Zmax*2)
         };
@@ -259,7 +264,7 @@ $( function() {
       max: 800,
       values: [ Cmin, Cmax ],
       slide: function( event, ui ) {
-        $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] );   
+        $( "#amount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] +"+");   
         
         },
         change: function( event, ui ){
@@ -269,7 +274,7 @@ $( function() {
         }
     });
     $( "#amount" ).val( $( "#slider-range" ).slider( "values", 0 ) +
-      " - " + $( "#slider-range" ).slider( "values", 1 )); // initially
+      " - " + $( "#slider-range" ).slider( "values", 1 )+"+") ; // initially
   });
 
 
