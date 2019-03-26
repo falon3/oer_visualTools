@@ -106,21 +106,21 @@ var P = {
 }
 
 // CAN REFACTOR THIS INTO A GET CURRENT WEATHER ROUTINE AND OPTION FOR USER LATER
-d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.8249187", function(data) {
-    // console.log(data.iss_position.latitude);
-    var cws = JSON.stringify(data.windspeed);
-    cws = cws.match(/\d/g);
-    cws = cws.join("");
-    // THIS DOESNT LOOK RIGHT FOR GETTING WIND DIRECTION?? HARDCODED
-    var cwd = JSON.stringify(data.winddisplay);
-    // var myString = cwd;
-    var cwd = cwd.split("6 mph");
-    cwd = cwd[1];
+// d3.json("https://f.stdlib.com/thisdavej/weather/current/?loc=22.234076,91.8249187", function(data) {
+//     // console.log(data.iss_position.latitude);
+//     var cws = JSON.stringify(data.windspeed);
+//     cws = cws.match(/\d/g);
+//     cws = cws.join("");
+//     // THIS DOESNT LOOK RIGHT FOR GETTING WIND DIRECTION?? HARDCODED
+//     var cwd = JSON.stringify(data.winddisplay);
+//     // var myString = cwd;
+//     var cwd = cwd.split("6 mph");
+//     cwd = cwd[1];
 
-    if (cwd===undefined){
-      cwd=1;
-    }
-});  
+//     if (cwd===undefined){
+//       cwd=1;
+//     }
+// });  
 
 // Us is wind speed at height h (at stack opening)
 // h is stack height
