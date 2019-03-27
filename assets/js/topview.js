@@ -1,4 +1,7 @@
+
+
 function drawNewMap(){
+    console.log("drawnewmap");
     //keep old zoom
     if (map) {
         zoom = map.getZoom();
