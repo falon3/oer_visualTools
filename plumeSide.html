@@ -9,10 +9,12 @@
           src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
     <script type="text/javascript" 
           src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
+    <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
     <script src="https://d3js.org/d3.v4.min.js"></script>    
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type='text/javascript' src="config/formulas.js"></script>
     <script type='text/javascript' src="assets/js/plumeSide.js"></script>
+     <script type='text/javascript' src="assets/js/sideview.js"></script>
     
     <link rel="stylesheet" href="assets/css/jquery-ui.min.css">
   
@@ -99,10 +101,10 @@
        <input class="userdata" name="Q" type="range"  id="QRange" min="1000000" max="80000000" oninput="QOut.value = QRange.value"><br>
 
        <label>ws: Wind Speed from Meteorological Tower = <input name="ws" class="sliderout" id="wsOut" style="width:40px;" oninput="wsRange.value=wsOut.value"></input> m/s</label><br>
-       <input class="userdata" name="ws" type="range"  id="wsRange"  min="0" max="60" oninput="wsOut.value = wsRange.value"><br>   
+       <input class="userdata" name="ws" type="range"  id="wsRange"  min="1" max="60" oninput="wsOut.value = wsRange.value"><br>   
 
        <label>Z1: Height of Tower = <input name="Z1" class="sliderout" id="Z1Out" oninput="Z1Range.value=Z1Out.value"></input> m</label><br>
-       <input class="userdata" name="Z1" type="range"  id="Z1Range"  min="0" max="60" oninput="Z1Out.value = Z1Range.value"><br>
+       <input class="userdata" name="Z1" type="range"  id="Z1Range"  min="1" max="60" oninput="Z1Out.value = Z1Range.value"><br>
        
        <label>Pa: Atmospheric Pressure at Ground Level = <input name="Pa" class="sliderout" id="PaOut" oninput="PaRange.value=PaOut.value"></input> mb</label><br> 
        <input class="userdata" type="range"   name="Pa" id="PaRange"  min="300" max="4000" oninput="PaOut.value = PaRange.value"><br>

@@ -12,10 +12,12 @@
 //      "Pa": atmospheric pressure at ground level (mb)
 
 var defaults = { 
+  "wd": 180, // it's wd-90 
   "ws":5,
   "Q": 25000000,
-  "mw": 17,
   "sc": "ud",
+  "lat": 53.5253, // Edmonton, Alberta U of A
+  "lon": -113.5257,
   "h": 50,
   "Xmax": 1000,
   "Z1": 10,
@@ -24,31 +26,36 @@ var defaults = {
   "Ts": 400,
   "Ta": 283,
   "Pa": 1032,
+  "z": "plume",
   "Cmin" : 5,
   "Cmax": 250
 };       
 
-var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"];
+var all_sliders = ["Q","Xmax","ws","Z1","Pa","h","ds","Vs","Ts","Ta"]; //wd
 
-//SETUP Globals
-var ws = defaults["ws"];
-var Q = defaults["Q"];
-var mw = defaults["mw"];
-var sc= defaults["sc"];
-var h = defaults["h"];
-var Xmax = defaults["Xmax"];
-var Z1 = defaults["Z1"];
-var Vs = defaults["Vs"];
-var ds = defaults["ds"];
-var Ts = defaults["Ts"];
-var Ta = defaults["Ta"];
-var Pa = defaults["Pa"];
-var Cmin = defaults["Cmin"];
-var Cmax = defaults["Cmax"];
-var chart;
-var Zmax = 500; 
+// COLOR CODES FOR MAPVIEW EGIONS
+//each colored area with so much μg/m^3 concentration
+// level in μg/m^3
+// var polution_max = 100;
+// var polution_min = 5;
+var polution_levels = {
+    0: {color: '#9FFF33', level: 5},
+    1: {color: '#fbe37f', level: 20},
+    2: {color: '#ffcd00', level: 35},
+    3: {color: '#fb740c', level: 50},
+    4: {color: '#f32a2a', level: 65},
+    5: {color: '#5d0404', level: 100}
+}
+// API key from https://github.com/touhid55/GaussianPlume
+var config = {
+  apiKey: "AIzaSyBuqgAHTym57lDY8g6e8Xuf80E2s8mw-9A",
+  authDomain: "gauss-54e5b.firebaseapp.com",
+  databaseURL: "https://gauss-54e5b.firebaseio.com",
+  projectId: "gauss-54e5b",
+  storageBucket: "gauss-54e5b.appspot.com",
+  messagingSenderId: "1039094609006"
+};
 
-var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
 // P is function of atmospheric stability (A to F) 
 // and surface roughness (urban vs rural (also called open country) environment
 var P = {
@@ -66,6 +73,38 @@ var P = {
     "rf": 0.55
 }
 
+//SETUP Globals
+firebase.initializeApp(config);
+//var event = firebase.database().ref('TR')
+//var wd = defaults["wd"]-90;
+var ws = defaults["ws"];
+var Q = defaults["Q"];
+var sc= defaults["sc"];
+var latitude = defaults["lat"];
+var longitude = defaults["lon"];
+var h = defaults["h"];
+var Xmax = defaults["Xmax"];
+var Z1 = defaults["Z1"];
+var Vs = defaults["Vs"];
+var ds = defaults["ds"];
+var Ts = defaults["Ts"];
+var Ta = defaults["Ta"];
+var Pa = defaults["Pa"];
+var z = defaults["z"];
+var Cmin = defaults["Cmin"];
+var Cmax = defaults["Cmax"];
+var Zmax = 500; 
+
+// setup map
+var map;
+var zoom = 14;
+var center= {lat: latitude, lng: longitude};
+var infoWindow;
+var RADIANS =57.2957795;
+
+//setup chart data
+var chart;
+var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
 // Us is wind speed at height h (at stack opening)
 // h is stack height
 // Z1 is height of meteorological tower
@@ -89,163 +128,163 @@ function calculateDeltaH(Us){
 
 
 
-function initPlot() {
-    var Us = calculateUs();
-    var deltaH = calculateDeltaH(Us);
-    var H = h + deltaH;
+// function initPlot() {
+//     var Us = calculateUs();
+//     var deltaH = calculateDeltaH(Us);
+//     var H = h + deltaH;
 
-    make_plot( Us, H);
+//     make_plot( Us, H);
     
-}
+// }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-function make_plot(Us, H) {
-    with (Math) {
-                 // var xx, yy, r, ct, st, angle;
-        var RADIANS =57.2957795;
-        to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
-        var y = 0; // sideview from y=0
+//   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// function make_plot(Us, H) {
+//     with (Math) {
+//                  // var xx, yy, r, ct, st, angle;
+//         var RADIANS =57.2957795;
+//         to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
+//         var y = 0; // sideview from y=0
 
-        var x = [0, 5, 10];           
-        var k = 2;
-        while (x[k] < Xmax-10){
-             x.push(x[k]+10);  
-             k=k+1;
-        }
-        Zmax = H+350;
-        var z = [0, 5];
-        var k = 1;
-        while (z[k] < Zmax-1){
-             z.push(z[k]+5);  
-             k=k+1;
-        }
+//         var x = [1, 5, 10];           
+//         var k = 2;
+//         while (x[k] < Xmax-10){
+//              x.push(x[k]+10);  
+//              k=k+1;
+//         }
+//         Zmax = H+350;
+//         var z = [0, 5];
+//         var k = 1;
+//         while (z[k] < Zmax-1){
+//              z.push(z[k]+5);  
+//              k=k+1;
+//         }
 
-        var sigy =[];
-        var sigy1 =[];
-        var sigz =[];
-        var sigz1 =[];
-        var ccen =[];
-        var cfin = [];
-        var y5 = [];
-        var y51 = [];
-        var ynew1 =[];
+//         var sigy =[];
+//         var sigy1 =[];
+//         var sigz =[];
+//         var sigz1 =[];
+//         var ccen =[];
+//         var cfin = [];
+//         var y5 = [];
+//         var y51 = [];
+//         var ynew1 =[];
       
-        for (i in x){
-                ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
-                if (sc=="ra") {
-                 sigy[i] = 0.22*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                       sigz[i] = 0.20*x[i];//0.016*x[i]*Math.pow((1+0.0003*x[i]),-1);
-                   }
-                   else if(sc=="rb"){
-                      sigy[i] = 0.16*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                      sigz[i] = 0.12*x[i];
-                  }
-                  else if(sc=="rc"){
-                      sigy[i] = 0.11*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                      sigz[i] = 0.08*x[i]*Math.pow((1+0.0002*x[i]), -0.5);
-                  }
-                  else if(sc=="rd"){
-                      sigy[i] = 0.08*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                      sigz[i] = 0.06*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
-                  }
-                  else if(sc=="re"){
-                      sigy[i] = 0.06*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                      sigz[i] = 0.03*x[i]*Math.pow((1+0.0003*x[i]), -1);
-                  }
-                  else if(sc=="rf"){
-                      sigy[i] = 0.04*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
-                      sigz[i] = 0.016*x[i]*Math.pow((1+0.0003*x[i]), -1);
-                  }
-                  else if(sc=="ua"||"ub"){
-                      sigy[i] = 0.32*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                      sigz[i] = 0.24*x[i]*Math.pow((1+0.001*x[i]), -0.5);
-                  }
-                  else if(sc=="uc"){
-                      sigy[i] = 0.22*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                      sigz[i] = 0.20*x[i];
-                  }
-                  else if(sc=="ud"){
-                      sigy[i] = 0.16*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                      sigz[i] = 0.14*x[i]*Math.pow((1+0.003*x[i]), -0.5);
-                  }
-                  else if(sc=="ue"||"uf"){
-                      sigy[i] = 0.11*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
-                      sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
-                  }
-                  //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
-                    //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
+//         for (i in x){
+//                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
+//                 if (sc=="ra") {
+//                       sigy[i] = 0.22*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+//                       sigz[i] = 0.20*x[i];//0.016*x[i]*Math.pow((1+0.0003*x[i]),-1);
+//                    }
+//                    else if(sc=="rb"){
+//                       sigy[i] = 0.16*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+//                       sigz[i] = 0.12*x[i];
+//                   }
+//                   else if(sc=="rc"){
+//                       sigy[i] = 0.11*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+//                       sigz[i] = 0.08*x[i]*Math.pow((1+0.0002*x[i]), -0.5);
+//                   }
+//                   else if(sc=="rd"){
+//                       sigy[i] = 0.08*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+//                       sigz[i] = 0.06*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
+//                   }
+//                   else if(sc=="re"){
+//                       sigy[i] = 0.06*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+//                       sigz[i] = 0.03*x[i]*Math.pow((1+0.0003*x[i]), -1);
+//                   }
+//                   else if(sc=="rf"){
+//                       sigy[i] = 0.04*x[i]*Math.pow((1+0.0001*x[i]), -0.5);
+//                       sigz[i] = 0.016*x[i]*Math.pow((1+0.0003*x[i]), -1);
+//                   }
+//                   else if(sc=="ua"||"ub"){
+//                       sigy[i] = 0.32*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+//                       sigz[i] = 0.24*x[i]*Math.pow((1+0.001*x[i]), -0.5);
+//                   }
+//                   else if(sc=="uc"){
+//                       sigy[i] = 0.22*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+//                       sigz[i] = 0.20*x[i];
+//                   }
+//                   else if(sc=="ud"){
+//                       sigy[i] = 0.16*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+//                       sigz[i] = 0.14*x[i]*Math.pow((1+0.003*x[i]), -0.5);
+//                   }
+//                   else if(sc=="ue"||"uf"){
+//                       sigy[i] = 0.11*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
+//                       sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
+//                   }
+//                   //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
+//                     //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
 
-                    for (j in z){
-                       if (sigz[i]<(H/2.15)){
-                            c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
-                        }
-                        else { //after plume hits the ground)   
-                            c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
-                       }
-                       //console.log(['',x[i],z[i], c]);
-                       if (c==0 && z[j]>H) continue; // more than half skip the empty zone
-                       if (c!=0) to_plot.push(['',x[i],z[j], c]);
+//                     for (j in z){
+//                        if (sigz[i]<(H/2.15)){
+//                             c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
+//                         }
+//                         else { //after plume hits the ground)   
+//                             c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
+//                        }
+//                        //console.log(['',x[i],z[i], c]);
+//                        if (c==0 && z[j]>H) continue; // more than half skip the empty zone
+//                        if (c!=0) to_plot.push(['',x[i],z[j], c]);
                           
-                    }
-                   // keep track of the line where the plume hits ground
-                   // if (abs(sigz[i]-(H/2.15))<0.5){
-                   //          bounce_y.push(y5[i], -y5[i]);
-                   //      }
+//                     }
+//                    // keep track of the line where the plume hits ground
+//                    // if (abs(sigz[i]-(H/2.15))<0.5){
+//                    //          bounce_y.push(y5[i], -y5[i]);
+//                    //      }
                    
-        }
-        //console.log("HERE");
-        google.charts.load("current", {packages:["corechart"]});
-        google.charts.setOnLoadCallback(drawChart);
+//         }
+//         //console.log("HERE");
+//         google.charts.load("current", {packages:["corechart"]});
+//         google.charts.setOnLoadCallback(drawChart);
 
-    }
-};
-// before plume hit's the ground
-function C_eq1(Q, sigy, sigz, Us, y, z, H) {
-        var base = Q/(2*3.1416*sigy*sigz*Us); 
-        c = base*Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))));
-        if (c<1 || isNaN(c)==true){
-            c = 0;
-        }
-    return c;
-};
+//     }
+// };
+// // before plume hit's the ground
+// function C_eq1(Q, sigy, sigz, Us, y, z, H) {
+//         var base = Q/(2*3.1416*sigy*sigz*Us); 
+//         c = base*Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))));
+//         if (c<1 || isNaN(c)==true){
+//             c = 0;
+//         }
+//     return c;
+// };
 
-//after plume hits the ground
-function C_eq2(Q, sigy, sigz, Us, y, z, H) {
-        var base = Q/(2*3.1416*sigy*sigz*Us); 
-        c = base*(Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))))
-                  +Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z+H)/sigz,2)))));
-        if (c<1 || isNaN(c)==true){
-            c = 0;
-        }
-    return c;
-};
+// //after plume hits the ground
+// function C_eq2(Q, sigy, sigz, Us, y, z, H) {
+//         var base = Q/(2*3.1416*sigy*sigz*Us); 
+//         c = base*(Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))))
+//                   +Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z+H)/sigz,2)))));
+//         if (c<1 || isNaN(c)==true){
+//             c = 0;
+//         }
+//     return c;
+// };
 
-function drawChart() {
-        if (chart){
-            chart = chart.clearChart();
-        }
-        var filtered = to_plot.filter(function(value, index, arr){
-            return arr[index][3] >= Cmin;
-            });
-        filtered.unshift([ 'ID', 'X', 'Z', 'Concentration']);
-        var data = google.visualization.arrayToDataTable(filtered);
+// function drawChart() {
+//         if (chart){
+//             chart = chart.clearChart();
+//         }
+//         var filtered = to_plot.filter(function(value, index, arr){
+//             return arr[index][3] >= Cmin;
+//             });
+//         filtered.unshift([ 'ID', 'X', 'Z', 'Concentration']);
+//         var data = google.visualization.arrayToDataTable(filtered);
 
-        var options = {
-          colorAxis: {colors: ['yellow', 'red'], maxValue: Cmax, minValue: Cmin},
-          sizeAxis: {minSize:7, minValue:0, maxSize:7},
-            hAxis: {title: 'X (meters)', maxValue:Math.max(500, Xmax)},
-            vAxis: {title: 'Z (meters)', maxValue:Math.max(300, Zmax), viewWindowMode:'pretty'},//maxValue:Math.max(400, Zmax)},
-            sortBubblesBySize: false,
-            bubble: {opacity: 0.6},
-            chartArea:{width:'80%',height:'80%'},
-            explorer: { keepInBounds: true },
-           width: Math.max(900,Xmax*0.60),
-           height: Math.max(700, Zmax*2)
-        };
+//         var options = {
+//           colorAxis: {colors: ['yellow', 'red'], maxValue: Cmax, minValue: Cmin},
+//           sizeAxis: {minSize:7, minValue:0, maxSize:7},
+//             hAxis: {title: 'X (meters)', maxValue:Math.max(500, Xmax)},
+//             vAxis: {title: 'Z (meters)', maxValue:Math.max(300, Zmax), viewWindowMode:'pretty'},//maxValue:Math.max(400, Zmax)},
+//             sortBubblesBySize: false,
+//             bubble: {opacity: 0.6},
+//             chartArea:{width:'80%',height:'80%'},
+//             explorer: { keepInBounds: true },
+//            width: Math.max(900,Xmax*0.60),
+//            height: Math.max(700, Zmax*2)
+//         };
 
-        chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
-        chart.draw(data, options);
-      }
+//         chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
+//         chart.draw(data, options);
+//       }
             
     
     //set and display defaults for sliders
@@ -284,56 +323,19 @@ $( document ).ready(function() {
     initPlot();
     console.log( "ready!" );
     // Update from user input changes
-    $("input[name='ws']").on('change', function(){
-        ws = parseInt($(this).val());
-        initPlot();
-    });
-    $("input[name='Q']").on('change', function(){
-        Q = parseInt($(this).val());
-        initPlot();
-    });
-    $("input[name='h']").on('change', function(){
-        h = parseInt($(this).val());
-        initPlot();
-    });
-    $("input[name='Xmax']").on('change', function(){
-        Xmax = $(this).val();
-        initPlot();
-    });
-    $("input[name='Z1']").on('change', function(){
-        Z1 = $(this).val();
-        initPlot();
-    });
-    $("input[name='Vs']").on('change', function(){
-        Vs = $(this).val();
-        initPlot();
-    });
-    $("input[name='ds']").on('change', function(){
-        ds = $(this).val();
-        initPlot();
-    });
-    $("input[name='Ts']").on('change', function(){
-        Ts = $(this).val();
-        initPlot();
-    });
-    $("input[name='Ta']").on('change', function(){
-        Ta = $(this).val();
-        initPlot();
-    });
-    $("input[name='Pa']").on('change', function(){
-        Pa = $(this).val();
-        initPlot();
-    });
-     
-    $("#sclass").on('change', function(){
-        var cl = $(this).val();
+    $('#data').on('change', 'input', function () {
+        ws = parseInt($("input[name='ws']").val());
+        Q = parseInt($("input[name='Q']").val());
+        h = parseInt($("input[name='h']").val());
+        Xmax = $("input[name='Xmax']").val();
+        Z1 = $("input[name='Z1']").val();
+        Vs = $("input[name='Vs']").val();
+        ds = $("input[name='ds']").val();
+        Ts = $("input[name='Ts']").val();
+        Ta = $("input[name='Ta']").val();
+        Pa = $("input[name='Pa']").val();    
+ 
         var sloc = $("#sloc").val();
-        sc = sloc+cl;
-        //console.log(sc);
-        initPlot();
-    });
-    $("#sloc").on('change', function(){
-        var sloc = $(this).val();
         var cl = $("#sclass").val();
         sc = sloc+cl;
         //console.log(sc);
