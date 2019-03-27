@@ -20,7 +20,7 @@
   
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
-    <title>Plume Side View</title>
+    <title>Plume Visualization</title>
     <style>
       /* Always set the map height explicitly to define the size of the div
        * element that contains the map. */
@@ -29,11 +29,9 @@
       
         }
       #chart_div {
-        position: absolute;
+        float:left;
         height: 100%;
         width: 65%;
-        top:10px;
-        left:0px;
         box-sizing: border-box;
         padding: 10px;
         overflow-x: scroll;
@@ -45,7 +43,7 @@
         height: 100%;
         overflow: auto;
         box-sizing: border-box;
-        padding: 10px;
+        padding: 15px;
       }
       /* Optional: Makes the sample page fill the window. */
       html, body {
@@ -59,13 +57,6 @@
         font-size:large;
         width:75px;
       }
-   
-      /* Optional: Makes the sample page fill the window. */
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
       .userdata{
             margin-bottom: 10px;
       }
@@ -75,28 +66,68 @@
         .concentration {
             position: absolute;
             left: 25%;
-            top:5px;
+            top:50px;
           z-index: 10;
           background-color: white;
         }
+
+     /* NAVBAR  */   
+    ul {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #333;
+    }
+
+    li {
+      float: left;
+      border-right:1px solid #bbb;
+    }
+
+    li:last-child {
+      border-right: none;
+    }
+
+    li a {
+      display: block;
+      color: white;
+      text-align: center;
+      padding: 14px 16px;
+      text-decoration: none;
+    }
+
+    li a:hover:not(.active) {
+      background-color: #111;
+    }
+
+    .active {
+      background-color: #4CAF50;
+    }
+     /* END NAVBAR  */ 
     </style>
 
   </head>
   
   <body>
-
+    <div id="navbar">
+    <ul>
+      <li><a href="#home">Top View</a></li>
+      <li><a class="active" href="#news">Side View</a></li>
+      <li><a href="#contact">Concentration Profile</a></li>
+      <li style="float:right"><a href="model.html">About</a></li>
+    </ul>
+    </div>
     <div id="container">
-        <div id="chart_div""></div>
-            <div class='concentration'>
-            
+        <div class='concentration'>       
           <label for="amount">Concentration range:</label>
           <input type="text" id="amount" readonly style="width: 100px; font-size:medium; border:0; color: #2c2d2c; font-weight:bold;">
            <br>
-         
-        <div style = "margin-top:5px;" id="slider-range"></div>
-      </div>
+            <div style = "margin-top:5px;" id="slider-range"></div>
+        </div>
+        <div id="chart_div""></div>
+         <div style="display:none;" id="map"></div>   
         <div id="data">
-            <div style="margin-bottom: 10px;" >Ref: <a href="model.html">Overview of the Gaussian model used for concentration calculations</a></div>
        <label>Q: Source strength of Contaminant = <input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input> μg/s</label><br>
        <input class="userdata" name="Q" type="range"  id="QRange" min="1000000" max="80000000" oninput="QOut.value = QRange.value"><br>
 

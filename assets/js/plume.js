@@ -181,7 +181,7 @@ $( function() {
 
 $( document ).ready(function() {
 
-    setSliderValues(all_sliders);
+    setSliderValues(all_sliders); // including wd
     labelWindDirection();
     console.log( "ready!" );
     // Update from user input changes
@@ -225,6 +225,24 @@ $( document ).ready(function() {
         Pa = $(this).val();
         drawNewMap();
     });
+    
+    $("#sclass").on('change', function(){
+        var cl = $(this).val();
+        var sloc = $("#sloc").val();
+        sc = sloc+cl;
+        //console.log(sc);
+        drawNewMap();
+    });
+    $("#sloc").on('change', function(){
+        var sloc = $(this).val();
+        var cl = $("#sclass").val();
+        sc = sloc+cl;
+        //console.log(sc);
+        drawNewMap();
+    });
+
+
+    ///// only for topview
     $("input[name='wd']").on('change', function(){
         wd = $(this).val()-90;
         labelWindDirection();
@@ -238,20 +256,6 @@ $( document ).ready(function() {
     $("#lon").on('change', function(){
         longitude = parseFloat($(this).val());
         map.setCenter({lat: latitude, lng: longitude});
-        drawNewMap();
-    });
-    $("#sclass").on('change', function(){
-        var cl = $(this).val();
-        var sloc = $("#sloc").val();
-        sc = sloc+cl;
-        //console.log(sc);
-        drawNewMap();
-    });
-    $("#sloc").on('change', function(){
-        var sloc = $(this).val();
-        var cl = $("#sclass").val();
-        sc = sloc+cl;
-        //console.log(sc);
         drawNewMap();
     });
     $("#z").on('change', function(){
