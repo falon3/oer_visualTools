@@ -23,7 +23,7 @@ var variables = {
             "unit": 'm',
             "type": "range",
             "step": 1,
-            "slider-min": 1, 
+            "slider-min": 1, // can't be zero or mathematical error divide by zero
             "slider-max": 60
         },
         'Pa': {
@@ -98,7 +98,7 @@ var variables = {
             "slider-min": 100, 
             "slider-max": 8000
         },
-        'lat': {
+        'lat': { /// these aren't actually set here, hardcoded in plume.html right now
             "label": "Latitude:",
             "default": 53.5253,
             "unit": '',
@@ -112,13 +112,13 @@ var variables = {
             "type": "number",
             "step": 0.0001
         },
-        'z': {
+        'z': { //this one is done a bit differently in user interface for each value, check plume.html
             "label": "z: z-axis level of measurement at",
             "default": "plume",
             "options": ["plume", "ground"],        
             "type": "select"
         },
-        'sc': { //this one is done a bit differently in user interface
+        'sc': { //this one is done a bit differently in user interface, , check plume.html
             "label": "sc: Stability Class",
             "default": "ud",
             "options": ["ua","ub","uc","ud","ue","uf","ra","rb","rc","rd","re","rf"],       
