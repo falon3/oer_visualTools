@@ -220,85 +220,73 @@
 
 
         <div id="data">
-       <label>Q: Source strength of Contaminant = <input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input> μg/s</label><br>
+       <label for="QRange"><input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input></label><br>
        <input class="userdata" name="Q" type="range"  id="QRange" oninput="QOut.value = QRange.value"><br>
 
-       <label>ws: Wind Speed from Meteorological Tower = <input name="ws" class="sliderout" id="wsOut" style="width:40px;" oninput="wsRange.value=wsOut.value"></input> m/s</label><br>
+       <label for="wsRange"><input name="ws" class="sliderout" id="wsOut" style="width:40px;" oninput="wsRange.value=wsOut.value"></input> </label><br>
        <input class="userdata" name="ws" type="range"  id="wsRange" oninput="wsOut.value = wsRange.value"><br>   
 
-       <label>Z1: Height of Tower = <input name="Z1" class="sliderout" id="Z1Out" oninput="Z1Range.value=Z1Out.value"></input> m</label><br>
+       <label for="Z1Range"><input name="Z1" class="sliderout" id="Z1Out" oninput="Z1Range.value=Z1Out.value"></input> </label><br>
        <input class="userdata" name="Z1" type="range"  id="Z1Range" oninput="Z1Out.value = Z1Range.value"><br>
        
-       <label>Pa: Atmospheric Pressure at Ground Level = <input name="Pa" class="sliderout" id="PaOut" oninput="PaRange.value=PaOut.value"></input> mb</label><br> 
+       <label for="PaRange"><input name="Pa" class="sliderout" id="PaOut" oninput="PaRange.value=PaOut.value"></input> </label><br> 
        <input class="userdata" type="range" name="Pa" id="PaRange" oninput="PaOut.value = PaRange.value"><br>
 
 
        <!-- FOR TOPVIEW ONLY -->
        <span class="topview" id="wdSpan">
-       <label >wd: Wind Direction = <input name ="wd" class="sliderout" id = "wdOut" oninput="wdRange.value=wdOut.value"></input><span id="wdLetter"></span></label><br> 
+       <label for="wdRange"><input name ="wd" class="sliderout" id = "wdOut" oninput="wdRange.value=wdOut.value"></input><span id="wdLetter"></span></label><br> 
        <input class="userdata" type="range"   name="wd" id="wdRange"  oninput="wdOut.value = wdRange.value"><br>
         </span>
        <!-- END FOR TOPVIEW ONLY -->
 
 
-       <label>h: Physical Height of Stack = <input class="sliderout" name="h" id="hOut" oninput="hRange.value=hOut.value"></input> m</label><br>
+       <label for="hRange"><input class="sliderout" name="h" id="hOut" oninput="hRange.value=hOut.value"></input> </label><br>
        <input class="userdata" type="range" name="h" id="hRange" oninput="hOut.value = hRange.value"><br>
        
-       <label>ds: Inside Diameter of Stack = <input name="ds" class="sliderout" id="dsOut" oninput="dsRange.value=dsOut.value"></input> m</label><br>      
+       <label for="dsRange"><input name="ds" class="sliderout" id="dsOut" oninput="dsRange.value=dsOut.value"></input> </label><br>      
        <input class="userdata" name="ds" type="range"  id="dsRange" oninput="dsOut.value = dsRange.value"><br>
 
-       <label>Vs: Vertical Stack Gas Velocity = <input name="Vs" class="sliderout" id="VsOut" oninput="VsRange.value=VsOut.value"></input> m/sec</label><br>
+       <label for="VsRange"><input name="Vs" class="sliderout" id="VsOut" oninput="VsRange.value=VsOut.value"></input></label><br>
        <input class="userdata" name="Vs" type="range"  id="VsRange" oninput="VsOut.value = VsRange.value"><br>
       
-       <label>Ts: Exhaust Gas Stream Temp at Stack Outlet = <input name="Ts" class="sliderout" id="TsOut" oninput="TsRange.value=TsOut.value"></input> K</label><br>
+       <label for="TsRange"><input name="Ts" class="sliderout" id="TsOut" oninput="TsRange.value=TsOut.value"></input> </label><br>
        <input class="userdata" name="Ts" type="range"  id="TsRange" oninput="TsOut.value = TsRange.value"><br>
       
-       <label>Ta: Temp of Atmosphere at Stack Outlet = <input name="Ta" class="sliderout" id="TaOut" oninput="TaRange.value=TaOut.value"></input> K</label><br>
+       <label for="TaRange"><input name="Ta" class="sliderout" id="TaOut" oninput="TaRange.value=TaOut.value"></input> </label><br>
        <input class="userdata" name="Ta" type="range"  id="TaRange" oninput="TaOut.value = TaRange.value"><br>
 
-       <label>X: Max distance X from stack = <input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> m</label><br>  
+       <label for="XmaxRange"><input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> </label><br>  
        <input class="userdata" type="range" name="Xmax" id="XmaxRange" oninput="XmaxOut.value = XmaxRange.value"><br>
 
 
        <!-- FOR TOPVIEW ONNLY -->
        <span class="topview" id="zSpan">
-       <label>z: z-axis level of measurement at</label><br>
+       <label for="z"></label><br>
        <select id="z">
-        <option value ="plume">Plume (z=H)</option>
-        <option value ="ground">Ground (z=0)</option>
+        <!-- <option value ="plume">Plume (z=H)</option>
+        <option value ="ground">Ground (z=0)</option> -->
       </select>
       <br>
         <br>
         </span>
       <!-- END FOR TOPVIEW ONNLY -->
 
-
-       <label>sc: Stability Class</label><br>
-       <select id="sclass">
-          <option value="d">D</option>
-          <option value="a">A</option>
-          <option value="b">B</option>
-          <option value="c">C</option>
-          <option value="e">E</option>
-          <option value="f">F</option>
-        </select>
-        <select id="sloc">
-           <option value="u">Urban</option>
-          <option value="r">Rural</option>        
+       <label for="sc"></label><br>
+       <select id="sc">
         </select>
         <br>
         <br>
-
 
         <!-- FOR TOPVIEW ONLY -->
         <span class="topview" id="locSpan">
         <label>Map Location of Stack</label>
        <br>
-       <label style="margin-right:5px; font-weight: normal;">Latitude:</label>
-       <input type="number" step="0.0001" class="userdata"  id="lat" value="53.5253">
+       <label for="lat" style="margin-right:5px; font-weight: normal;"></label>
+       <input type="number" class="userdata"  id="lat">
        <br>
-       <label style="margin-right:5px; font-weight: normal;">Longitude:</label>
-       <input type="number" step="0.0001" class="userdata"  id="lon" value="-113.5257">
+       <label for ="lon" style="margin-right:5px; font-weight: normal;"></label>
+       <input type="number" class="userdata"  id="lon">
         </span>
         <!-- end FOR TOPVIEW ONLY -->
 

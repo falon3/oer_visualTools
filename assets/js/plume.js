@@ -13,7 +13,7 @@
 var wd = variables["wd"]["default"]-90;
 var ws = variables["ws"]["default"];
 var Q = variables["Q"]["default"];
-var sc= variables["sc"]["default"];
+var sc= Object.keys(variables['sc']["default"])[0];
 var latitude = variables["lat"]["default"];
 var longitude = variables["lon"]["default"];
 var h = variables["h"]["default"];
@@ -24,12 +24,10 @@ var ds = variables["ds"]["default"];
 var Ts = variables["Ts"]["default"];
 var Ta = variables["Ta"]["default"];
 var Pa = variables["Pa"]["default"];
-var z = variables["z"]["default"];
+var z = Object.keys(variables['z']["default"])[0];
 var Cmin = 5;
 var Cmax = 250;
 var Zmax = 500;    
-
-var all_sliders = ["Q","Xmax","ws", "wd","Z1","Pa","h","ds","Vs","Ts","Ta"]; //wd
 
 // COLOR CODES FOR MAPVIEW EGIONS
 //each colored area with so much μg/m^3 concentration
@@ -107,18 +105,7 @@ function calculateDeltaH(Us){
     var deltaH = ((Vs*ds)/Us)*(1.5+ 0.00268*Pa*ds*((Ts-Ta)/Ts));
     return deltaH
 }
-  
-    //set and display defaults for sliders
-function setSliderValues(sliders){
-    for (i in sliders){
-        $("#"+sliders[i]+"Range").val(variables[sliders[i]]["default"]);
-        $("#"+sliders[i]+"Range").attr('min', variables[sliders[i]]["slider-min"]);
-        $("#"+sliders[i]+"Range").attr('max', variables[sliders[i]]["slider-max"]);
-        $("#"+sliders[i]+"Range").attr('step', variables[sliders[i]]["step"]);
-        //$("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
-        $("#"+sliders[i]+"Out").val(variables[sliders[i]]["default"]);
-    }
-}
+
 
 $( function() {
     $( "#topslider-range" ).slider({
@@ -169,6 +156,10 @@ $( function() {
       " - " + $( "#slider-range" ).slider( "values", 1 )+"+") ; // initially
   });
 
+
+// for toggling between buttons and pages
+var top_update = true;
+var side_update = true;
 function show_Topview(){
     $(".sideview").css("display", "none");
     $(".about").css("display", "none");
@@ -179,7 +170,6 @@ function show_Topview(){
         drawNewMap();
     } 
 }
-
 function show_Sideview(){ 
     $('.topview').css("display", "none");
     $("#about").css("display", "none");
@@ -197,20 +187,48 @@ function show_Sideview(){
 //     //$("#about").load("model.html");
 // }
 
-
-var top_update = true;
-var side_update = true;
+//set and display configs from configPlume.js
+function configVariables(){
+    Object.keys(variables).forEach( function(val,i){
+        if (variables[val]["type"]=="range"){ //sliders
+            var label = $('label[for="'+val+'Range"]').html();
+            $('label[for="'+val+'Range"]').empty();
+            $('label[for="'+val+'Range"]').html(variables[val]["label"] + label + variables[val]["unit"]);
+            $("#"+val+"Range").val(variables[val]["default"]);
+            $("#"+val+"Range").attr('min', variables[val]["slider-min"]);
+            $("#"+val+"Range").attr('max', variables[val]["slider-max"]);
+            $("#"+val+"Range").attr('step', variables[val]["step"]);
+            $("#"+val+"Out").val(variables[val]["default"]);
+        }
+        else if (variables[val]["type"]=="number"){
+            $("#"+val).attr('step', variables[val]["step"]);
+            $("#"+val).val(variables[val]["default"]);
+            $('label[for="'+val+'"]').html(variables[val]["label"]);
+        }
+        else if (variables[val]["type"]=="select"){ 
+            $('label[for="'+val+'"]').html(variables[val]["label"]);
+            var default_opt = Object.keys(variables[val]["default"])[0]
+            $("#"+val).append($('<option>', 
+                                { value: default_opt,text : 
+                                    variables[val]["default"][default_opt] }));
+            $.each(variables[val]["other_options"], function (v, t) {
+                $("#"+val).append($('<option>', 
+                    { value: v, text : t }));
+                });
+        }
+    });
+}
 
 $( document ).ready(function() {
     $('.topview').css("display", "block");
     $(".sideview").css("display", "none");
     $("#about").css("display", "none");
-    setSliderValues(all_sliders); // including wd for topview
+    configVariables(); // including wd for topview
     labelWindDirection(); /// for topview
     initPlot();
     console.log( "ready!" );
-    // Update from user input changes
 
+    // Update from user input changes
     $(".nav").click(function() {
         $(".nav").removeClass("active");
         tis = $(this);
@@ -228,9 +246,7 @@ $( document ).ready(function() {
         Ts = $("input[name='Ts']").val();
         Ta = $("input[name='Ta']").val();
         Pa = $("input[name='Pa']").val();    
-        var sloc = $("#sloc").val();
-        var cl = $("#sclass").val();
-        sc = sloc+cl;
+        sc = $("#sc").val();
    
 
         // only for topview

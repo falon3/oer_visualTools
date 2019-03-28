@@ -1,4 +1,7 @@
+// NOTE: the labels aren't yet configured dynamically from this file, they are set directly in plume.html
+
 var variables = {
+        // SLIDERS///////////////
         'Q': {
             "label": "Q: Source strength of Contaminant =",
             "default": 25000000,
@@ -98,30 +101,39 @@ var variables = {
             "slider-min": 100, 
             "slider-max": 8000
         },
-        'lat': { /// these aren't actually set here, hardcoded in plume.html right now
+        //// NUMBERS
+        'lat': { 
             "label": "Latitude:",
             "default": 53.5253,
-            "unit": '',
             "type": "number",
             "step": 0.0001
         },
         'lon': {
             "label": "Longitude:",
             "default": -113.5257,
-            "unit": '',
             "type": "number",
             "step": 0.0001
         },
-        'z': { //this one is done a bit differently in user interface for each value, check plume.html
+        'z': { // DROP DOWN SELECTS
             "label": "z: z-axis level of measurement at",
-            "default": "plume",
-            "options": ["plume", "ground"],        
+            "default": {"plume":"Plume (z=H)"}, //{option value: option textdisplayed}
+            "other_options": {"ground":"Ground (z=0)"},        
             "type": "select"
         },
-        'sc': { //this one is done a bit differently in user interface, , check plume.html
+        'sc': { 
             "label": "sc: Stability Class",
-            "default": "ud",
-            "options": ["ua","ub","uc","ud","ue","uf","ra","rb","rc","rd","re","rf"],       
+            "default": {"ud":"UD"},
+            "other_options": {"ua":"UA", //{option value: option textdisplayed}
+                                "ub":"UB", 
+                                "uc":"UC",
+                                "ue":"UE", 
+                                "uf":"UF", 
+                                "ra":"RA", 
+                                "rb":"RB", 
+                                "rc":"RC", 
+                                "rd":"RD", 
+                                "re": "RE", 
+                                "rf":"RF"},       
             "type": "select"
         }
     };
