@@ -10,26 +10,24 @@
 //      "Ts": temp of exhaust gas stream at stack outlet (K)
 //      "Ta": temp of the atmosphere at stack outlet (K)
 //      "Pa": atmospheric pressure at ground level (mb)
-
-var defaults = { 
-  "wd": 180, // it's wd-90 
-  "ws":5,
-  "Q": 25000000,
-  "sc": "ud",
-  "lat": 53.5253, // Edmonton, Alberta U of A
-  "lon": -113.5257,
-  "h": 50,
-  "Xmax": 1000,
-  "Z1": 10,
-  "Vs": 20,
-  "ds": 2,
-  "Ts": 400,
-  "Ta": 283,
-  "Pa": 1032,
-  "z": "plume",
-  "Cmin" : 5,
-  "Cmax": 250
-};       
+var wd = variables["wd"]["default"]-90;
+var ws = variables["ws"]["default"];
+var Q = variables["Q"]["default"];
+var sc= variables["sc"]["default"];
+var latitude = variables["lat"]["default"];
+var longitude = variables["lon"]["default"];
+var h = variables["h"]["default"];
+var Xmax = variables["Xmax"]["default"];
+var Z1 = variables["Z1"]["default"];
+var Vs = variables["Vs"]["default"];
+var ds = variables["ds"]["default"];
+var Ts = variables["Ts"]["default"];
+var Ta = variables["Ta"]["default"];
+var Pa = variables["Pa"]["default"];
+var z = variables["z"]["default"];
+var Cmin = 5;
+var Cmax = 250;
+var Zmax = 500;    
 
 var all_sliders = ["Q","Xmax","ws", "wd","Z1","Pa","h","ds","Vs","Ts","Ta"]; //wd
 
@@ -76,25 +74,7 @@ var config = {
 
 //SETUP Globals
 firebase.initializeApp(config);
-//var event = firebase.database().ref('TR')
-var wd = defaults["wd"]-90;
-var ws = defaults["ws"];
-var Q = defaults["Q"];
-var sc= defaults["sc"];
-var latitude = defaults["lat"];
-var longitude = defaults["lon"];
-var h = defaults["h"];
-var Xmax = defaults["Xmax"];
-var Z1 = defaults["Z1"];
-var Vs = defaults["Vs"];
-var ds = defaults["ds"];
-var Ts = defaults["Ts"];
-var Ta = defaults["Ta"];
-var Pa = defaults["Pa"];
-var z = defaults["z"];
-var Cmin = defaults["Cmin"];
-var Cmax = defaults["Cmax"];
-var Zmax = 500; 
+//var event = firebase.database().ref('TR') 
 
 // setup map
 var map;
@@ -131,9 +111,12 @@ function calculateDeltaH(Us){
     //set and display defaults for sliders
 function setSliderValues(sliders){
     for (i in sliders){
-        $("#"+sliders[i]+"Range").val(defaults[sliders[i]]);
+        $("#"+sliders[i]+"Range").val(variables[sliders[i]]["default"]);
+        $("#"+sliders[i]+"Range").attr('min', variables[sliders[i]]["slider-min"]);
+        $("#"+sliders[i]+"Range").attr('max', variables[sliders[i]]["slider-max"]);
+        $("#"+sliders[i]+"Range").attr('step', variables[sliders[i]]["step"]);
         //$("#"+sliders[i]+"Out").html(defaults[sliders[i]]);
-        $("#"+sliders[i]+"Out").val(defaults[sliders[i]]);
+        $("#"+sliders[i]+"Out").val(variables[sliders[i]]["default"]);
     }
 }
 
@@ -142,7 +125,7 @@ $( function() {
       range: true,
       min: 1,
       max: 800,
-      values: [ Cmin, Cmax ],
+      values: [ 5, 100],
       slide: function( event, ui ) {  
         $( "#topamount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] +"+");
         },
@@ -208,11 +191,11 @@ function show_Sideview(){
     } 
 }
 
-function load_model(){
-    $("#about").css("display", "block");
-    $(".plots").css("display", "none");
-    //$("#about").load("model.html");
-}
+// function load_model(){
+//     $("#about").css("display", "block");
+//     $(".plots").css("display", "none");
+//     //$("#about").load("model.html");
+// }
 
 
 var top_update = true;
@@ -267,8 +250,5 @@ $( document ).ready(function() {
             side_update = false;
             initPlot();
         }      
-        // drawNewMap(); // for topview
-        
-
          });
 });

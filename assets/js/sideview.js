@@ -84,7 +84,6 @@ function make_plot(Us, H) {
                   }
                   //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
                     //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
-
                     for (j in z){
                        if (sigz[i]<(H/2.15)){
                             c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
