@@ -5,8 +5,11 @@
     <script type="text/javascript" src="assets/js/jquery.min.js"></script>
     <script type="text/javascript" src="assets/js/jquery-ui.min.js"></script>
     <script type='text/javascript' src='assets/js/math.min.js'></script>
-    <script type="text/javascript" 
-          src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js"></script>
+    <!--[if lte IE 8]><script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/excanvas.min.js"></script><![endif]-->
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.symbol.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.flot.axislabels.js"></script>
+
     <script type="text/javascript" 
           src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
     <script src="https://www.gstatic.com/firebasejs/4.10.0/firebase.js"></script>
@@ -220,7 +223,7 @@
 
         <div class="sideview" id="chart_div"></div> <!-- //sidevioew -->
          <div class="topview" id="map"></div>  <!-- topview -->
-          <div class="ccenprofile" id="profile"></div>  <!-- c vs x profile -->
+          <div style="height: 100%;" class="ccenprofile" id="profile"></div>  <!-- c vs x profile -->
 
 
         <div id="data">

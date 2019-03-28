@@ -72,7 +72,27 @@ function c_vs_x() {
                    // if (c==0 && z[j]>H) continue; // more than half skip the empty zone
                    if (c!=0) pro_plot.push([x[i], c]);      
         }
-        $.plot($("#profile"), [pro_plot]);
+        $.plot($("#profile"), [pro_plot], {
+                xaxis:{
+                    axisLabel: 'X (meters)',
+                    axisLabelUseCanvas: true,
+                    axisLabelFontSizePixels: 15,
+                    axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                    axisLabelPadding: 8
+                },
+                yaxis:{
+                    axisLabel: 'Concentration (μg/m^3)',
+                    axisLabelUseCanvas: true,
+                    axisLabelFontSizePixels: 15,
+                    axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                    axisLabelPadding: 8
+                },
+                grid: {
+                hoverable: true,
+                borderWidth: 2,
+                margin:10
+                }
+        });
     }
 };
 // before plume hit's the ground
