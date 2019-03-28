@@ -13,7 +13,7 @@
 var wd = variables["wd"]["default"]-90;
 var ws = variables["ws"]["default"];
 var Q = variables["Q"]["default"];
-var sc= Object.keys(variables['sc']["default"])[0];
+var sc= Object.keys(variables['sloc']["default"])[0] + Object.keys(variables['sc']["default"])[0];
 var latitude = variables["lat"]["default"];
 var longitude = variables["lon"]["default"];
 var h = variables["h"]["default"];
@@ -81,10 +81,14 @@ var center= {lat: latitude, lng: longitude};
 var infoWindow;
 var RADIANS =57.2957795;
 
-
 //setup chart data
 var chart;
 var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
+
+//profile data
+var pro_plot = [[]];
+
+
 // Us is wind speed at height h (at stack opening)
 // h is stack height
 // Z1 is height of meteorological tower
@@ -105,6 +109,27 @@ function calculateDeltaH(Us){
     var deltaH = ((Vs*ds)/Us)*(1.5+ 0.00268*Pa*ds*((Ts-Ta)/Ts));
     return deltaH
 }
+
+// before plume hit's the ground
+function C_eq1(Q, sigy, sigz, Us, y, z, H) {
+        var base = Q/(2*3.1416*sigy*sigz*Us); 
+        c = base*Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))));
+        if (c<1 || isNaN(c)==true){
+            c = 0;
+        }
+    return c;
+};
+
+//after plume hits the ground
+function C_eq2(Q, sigy, sigz, Us, y, z, H) {
+        var base = Q/(2*3.1416*sigy*sigz*Us); 
+        c = base*(Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))))
+                  +Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z+H)/sigz,2)))));
+        if (c<1 || isNaN(c)==true){
+            c = 0;
+        }
+    return c;
+};
 
 
 $( function() {
@@ -160,10 +185,10 @@ $( function() {
 // for toggling between buttons and pages
 var top_update = true;
 var side_update = true;
+var ccenpro_update = true;
 function show_Topview(){
     $(".sideview").css("display", "none");
-    $(".about").css("display", "none");
-    $(".plots").css("display", "block");
+    $(".ccenprofile").css("display", "none");
     $('.topview').css("display", "block");
     if (top_update == true){
         top_update = false;
@@ -172,14 +197,23 @@ function show_Topview(){
 }
 function show_Sideview(){ 
     $('.topview').css("display", "none");
-    $("#about").css("display", "none");
-    $(".plots").css("display", "block");
+    $(".ccenprofile").css("display", "none");
     $(".sideview").css("display", "block");
     if (side_update == true) {
         side_update = false;
         initPlot();
     } 
 }
+function show_ccenprofile(){ 
+    $('.topview').css("display", "none");
+    $(".sideview").css("display", "none");
+    $(".ccenprofile").css("display", "block");
+    if (ccenpro_update == true) {
+        ccenpro_update = false;
+        c_vs_x();
+    } 
+}
+
 
 // function load_model(){
 //     $("#about").css("display", "block");
@@ -206,7 +240,7 @@ function configVariables(){
             $('label[for="'+val+'"]').html(variables[val]["label"]);
         }
         else if (variables[val]["type"]=="select"){ 
-            $('label[for="'+val+'"]').html(variables[val]["label"]);
+            if (variables[val]["label"]) $('label[for="'+val+'"]').html(variables[val]["label"]);     
             var default_opt = Object.keys(variables[val]["default"])[0]
             $("#"+val).append($('<option>', 
                                 { value: default_opt,text : 
@@ -218,14 +252,36 @@ function configVariables(){
         }
     });
 }
+function updateView(){
+    // only for topview
+    if ($(".topview").css("display")!="none"){        
+        top_update = false;
+        side_update = true;
+        ccenpro_update = true;
+        drawNewMap();
+    }  
+    else if ($(".sideview").css("display")!="none"){
+        top_update = true;
+        side_update = false;
+        ccenpro_update = true;
+        initPlot();
+    }      
+    else if ($(".ccenprofile").css("display")!="none"){
+        top_update = true;
+        side_update = true;
+        ccenpro_update = false;
+        c_vs_x();
+    }      
+}
 
 $( document ).ready(function() {
     $('.topview').css("display", "block");
     $(".sideview").css("display", "none");
-    $("#about").css("display", "none");
+    $(".ccenprofile").css("display", "none");
     configVariables(); // including wd for topview
     labelWindDirection(); /// for topview
     initPlot();
+    c_vs_x();
     console.log( "ready!" );
 
     // Update from user input changes
@@ -234,8 +290,20 @@ $( document ).ready(function() {
         tis = $(this);
         $(this).closest("a").addClass("active");
     });
+    // selects need individual listeners
+    $("#z").on('change', function(){
+        z = $(this).val();
+        updateView(); 
+    });
+    $(".sc").on('change', function(){
+        var cl = $("#sc").val();
+        var sloc = $("#sloc").val();
+        sc = sloc+cl;
+        updateView(); 
+    });
 
-    $('#data').on('change', 'input', function () {
+    $('#data').on('change', 'input', 'select', function () {
+        console.log("change");
         ws = parseInt($("input[name='ws']").val());
         Q = parseInt($("input[name='Q']").val());
         h = parseInt($("input[name='h']").val());
@@ -245,26 +313,13 @@ $( document ).ready(function() {
         ds = $("input[name='ds']").val();
         Ts = $("input[name='Ts']").val();
         Ta = $("input[name='Ta']").val();
-        Pa = $("input[name='Pa']").val();    
-        sc = $("#sc").val();
-   
+        Pa = $("input[name='Pa']").val(); 
+        wd = $("input[name='wd']").val()-90;
+        labelWindDirection();
+        latitude = parseFloat($("#lat").val());
+        longitude = parseFloat($("#lon").val());
+        map.setCenter({lat: latitude, lng: longitude});   
 
-        // only for topview
-        if ($(".topview").css("display")!="none"){
-            wd = $("input[name='wd']").val()-90;
-            labelWindDirection();
-            latitude = parseFloat($("#lat").val());
-            longitude = parseFloat($("#lon").val());
-            map.setCenter({lat: latitude, lng: longitude});
-            z = $("#z").val();
-            top_update = false;
-            side_update = true;
-            drawNewMap();
-        }  
-        else if ($(".sideview").css("display")!="none"){
-            top_update = true;
-            side_update = false;
-            initPlot();
-        }      
-         });
+        updateView();      
+    });
 });

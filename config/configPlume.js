@@ -122,18 +122,18 @@ var variables = {
         },
         'sc': { 
             "label": "sc: Stability Class",
-            "default": {"ud":"UD"},
-            "other_options": {"ua":"UA", //{option value: option textdisplayed}
-                                "ub":"UB", 
-                                "uc":"UC",
-                                "ue":"UE", 
-                                "uf":"UF", 
-                                "ra":"RA", 
-                                "rb":"RB", 
-                                "rc":"RC", 
-                                "rd":"RD", 
-                                "re": "RE", 
-                                "rf":"RF"},       
+            "default": {"d":"D"},
+            "other_options": {"a":"A", //{option value: option textdisplayed}
+                                "b":"B", 
+                                "c":"C",
+                                "e":"E", 
+                                "f":"F"},       
+            "type": "select"
+        },
+        'sloc': { 
+            "label": '',
+            "default": {"u":"U"},
+            "other_options": {"r":"R"}, //{option value: option textdisplayed}      
             "type": "select"
         }
     };

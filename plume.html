@@ -17,6 +17,7 @@
     <script type='text/javascript' src="assets/js/plume.js"></script>
      <script type='text/javascript' src="assets/js/sideview.js"></script>
      <script type='text/javascript' src="assets/js/topview.js"></script>
+     <script type='text/javascript' src="assets/js/ccenprofile.js"></script>
 
 
      <script async defer
@@ -35,27 +36,27 @@
             height: 100%;
       
         }
-      #chart_div {
+      div#chart_div, div#profile {
         float:left;
         height: 100%;
-        width: 65%;
+        width: 60%;
         box-sizing: border-box;
         padding: 10px;
         overflow-x: scroll;
         overflow-y: scroll;
-    }
+        }
         #map {
         float:left;
         height: 100%;
-        width: 65%;
+        width: 60%;
         top:0px;
         left:0px;
         box-sizing: border-box;
-            padding: 10px;
+        padding: 10px;
       }
       #data{
         float:right;
-        width:35%;
+        width:40%;
         height: 100%;
         overflow: auto;
         box-sizing: border-box;
@@ -71,7 +72,7 @@
       .sliderout{
         font-weight: bold; 
         font-size:large;
-        width:65px;
+        width:70px;
       }
       .userdata{
             margin-bottom: 10px;
@@ -179,14 +180,16 @@
   <body>
     <div id="navbar">
     <ul class="navbar">
-      <li><a class="nav active" href="#top" onclick="show_Topview()">Top View</a></li>
-      <li><a class="nav " href="#side" onclick="show_Sideview()">Side View</a></li>
-      <li><a class="nav" href="#profile">Concentration Profile</a></li>
-      <li style="float:right"><a href="model.html">About</a></li>
+        <li style="float:right"><a href="model.html">About</a></li>
+        <li style="float:right"><a class="nav" href="#profile" onclick="show_ccenprofile()">Concentration Profile</a></li>
+        <li style="float:right"><a class="nav " href="#side" onclick="show_Sideview()">Side View</a></li>
+      <li style="float:right"><a class="nav active" href="#top" onclick="show_Topview()">Top View</a></li>
+      
+      
+      
     </ul>
     </div>
-    <div id="about" w3-include-html="model.html"></div>
-    <div class="plots" id="container">
+    <div id="container">
         <div class='topview my-legend'> <!-- for topview  -->   
             <div class='legend-title'> Concentration of Contaminate (μg/m^3)</div>
             <div class='legend-scale'>
@@ -217,6 +220,7 @@
 
         <div class="sideview" id="chart_div"></div> <!-- //sidevioew -->
          <div class="topview" id="map"></div>  <!-- topview -->
+          <div class="ccenprofile" id="profile"></div>  <!-- c vs x profile -->
 
 
         <div id="data">
@@ -259,21 +263,19 @@
        <label for="XmaxRange"><input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> </label><br>  
        <input class="userdata" type="range" name="Xmax" id="XmaxRange" oninput="XmaxOut.value = XmaxRange.value"><br>
 
-
        <!-- FOR TOPVIEW ONNLY -->
        <span class="topview" id="zSpan">
        <label for="z"></label><br>
-       <select id="z">
-        <!-- <option value ="plume">Plume (z=H)</option>
-        <option value ="ground">Ground (z=0)</option> -->
+       <select class="userdata" id="z">
       </select>
       <br>
-        <br>
         </span>
       <!-- END FOR TOPVIEW ONNLY -->
 
-       <label for="sc"></label><br>
-       <select id="sc">
+       <label for="sc">sc: Stability Class</label><br>
+       <select class="sc" id="sc">
+        </select>
+        <select class="sc" id="sloc">       
         </select>
         <br>
         <br>

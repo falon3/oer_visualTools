@@ -1,4 +1,6 @@
 
+var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
+
 function initPlot() {
     var Us = calculateUs();
     var deltaH = calculateDeltaH(Us);
@@ -11,11 +13,8 @@ function initPlot() {
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 function make_plot(Us, H) {
     with (Math) {
-                 // var xx, yy, r, ct, st, angle;
-        var RADIANS =57.2957795;
-        to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
+        to_plot = [[ 'ID', 'X', 'Z', 'Concentration']]; // reset data
         var y = 0; // sideview from y=0
-
         var x = [1, 5, 10];           
         var k = 2;
         while (x[k] < Xmax-10){
@@ -31,15 +30,7 @@ function make_plot(Us, H) {
         }
 
         var sigy =[];
-        var sigy1 =[];
-        var sigz =[];
-        var sigz1 =[];
-        var ccen =[];
-        var cfin = [];
-        var y5 = [];
-        var y51 = [];
-        var ynew1 =[];
-      
+        var sigz =[];    
         for (i in x){
                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
                 if (sc=="ra") {
@@ -82,8 +73,6 @@ function make_plot(Us, H) {
                       sigy[i] = 0.11*x[i]*Math.pow((1+0.0004*x[i]), -0.5);
                       sigz[i] = 0.08*x[i]*Math.pow((1+0.0015*x[i]), -0.5);
                   }
-                  //ccen[i] = (Q*24.45*Math.pow(10, 3))/(3.1416*sigy[i]*sigz[i]*ws*mw); //old form in ppm
-                    //ccen[i] = Q/(2*3.1416*sigy[i]*sigz[i]*Us); // OUR FORMULA
                     for (j in z){
                        if (sigz[i]<(H/2.15)){
                             c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
@@ -102,31 +91,9 @@ function make_plot(Us, H) {
                    //      }
                    
         }
-        //console.log("HERE");
         google.charts.load("current", {packages:["corechart"]});
         google.charts.setOnLoadCallback(drawChart);
-
     }
-};
-// before plume hit's the ground
-function C_eq1(Q, sigy, sigz, Us, y, z, H) {
-        var base = Q/(2*3.1416*sigy*sigz*Us); 
-        c = base*Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))));
-        if (c<1 || isNaN(c)==true){
-            c = 0;
-        }
-    return c;
-};
-
-//after plume hits the ground
-function C_eq2(Q, sigy, sigz, Us, y, z, H) {
-        var base = Q/(2*3.1416*sigy*sigz*Us); 
-        c = base*(Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z-H)/sigz,2))))
-                  +Math.exp((-0.5*(Math.pow(y/sigy,2)))-(0.5*(Math.pow((z+H)/sigz,2)))));
-        if (c<1 || isNaN(c)==true){
-            c = 0;
-        }
-    return c;
 };
 
 function drawChart() {
@@ -148,8 +115,8 @@ function drawChart() {
             bubble: {opacity: 0.6},
             chartArea:{width:'80%',height:'80%'},
             explorer: { keepInBounds: true },
-           width: Math.max(900,Xmax*0.60),
-           height: Math.max(700, Zmax*2)
+           width: Math.max(700,Xmax*0.50),
+           height: Math.max(600, Zmax*1.7)
         };
 
         chart = new google.visualization.BubbleChart(document.getElementById('chart_div'));
