@@ -1,19 +1,24 @@
 
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+var plotDetail = null;
+var plotMaster = null;
+
 function c_vs_x() {
     with (Math) {
         var Us = calculateUs();
         var deltaH = calculateDeltaH(Us);
         var H = h + deltaH;
+        var z_num; //convert z from the word decription to a number
+        if (z=="plume") z_num = H;
+        else if (z=="ground") z_num=0;
 
 
         pro_plot = [[]];
         var y = 0; 
-        var z = 0;
-        var x = [1, 5, 10];           
-        var k = 2;
+        var x = [2, 4];           
+        var k = 1;
         while (x[k] < Xmax-10){
-             x.push(x[k]+10);  
+             x.push(x[k]+2);  
              k=k+1;
         }
         
@@ -64,35 +69,60 @@ function c_vs_x() {
                   }
 
                    if (sigz[i]<(H/2.15)){
-                        c = C_eq1(Q, sigy[i], sigz[i], Us, y, z, H);
+                        var c = C_eq1(Q, sigy[i], sigz[i], Us, y, z_num, H);
                     }
                     else { //after plume hits the ground)   
-                        c = C_eq2(Q, sigy[i], sigz[i], Us, y, z, H);
+                        var c = C_eq2(Q, sigy[i], sigz[i], Us, y, z_num, H);
                    }
                    // if (c==0 && z[j]>H) continue; // more than half skip the empty zone
                    if (c!=0) pro_plot.push([x[i], c]);      
         }
-        $.plot($("#profile"), [pro_plot], {
-                xaxis:{
-                    axisLabel: 'X (meters)',
-                    axisLabelUseCanvas: true,
-                    axisLabelFontSizePixels: 15,
-                    axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                    axisLabelPadding: 8
-                },
-                yaxis:{
-                    axisLabel: 'Concentration (μg/m^3)',
-                    axisLabelUseCanvas: true,
-                    axisLabelFontSizePixels: 15,
-                    axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
-                    axisLabelPadding: 8
-                },
-                grid: {
-                hoverable: true,
-                borderWidth: 2,
-                margin:10
-                }
-        });
+
+        var detailOptions = {
+                        series: {
+                            lines: {
+                                show: true
+                            },
+                            points: {
+                                show: false
+                            }
+                        },
+                        xaxis:{
+                            axisLabel: 'X (meters)',
+                            axisLabelUseCanvas: true,
+                            axisLabelFontSizePixels: 15,
+                            axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                            axisLabelPadding: 8
+                        },
+                        yaxis:{
+                            axisLabel: 'Concentration (μg/m^3)',
+                            axisLabelUseCanvas: true,
+                            axisLabelFontSizePixels: 15,
+                            axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                            axisLabelPadding: 8
+                        },
+                        pan: {
+                          interactive: true
+                        },
+                        zoom: {
+                          interactive: true,
+                          mode: "x"
+                        },
+                        grid: {
+                        hoverable: true,
+                        borderWidth: 2,
+                        margin:10,
+                        aboveData: true
+                        },
+                        selection:{
+                        mode: "xy"
+            }};
+
+        
+        plotDetail = $.plot($("#profile #detailContainer"), [pro_plot], detailOptions);
+        var orig_axes = plotDetail.getAxes();
+        //var min = axes.xaxis.min; 
+
         function showTooltip(x, y, contents, z) {
             $('<div id="flot-tooltip">' + contents + '</div>').css({
                 top: y - 50,
@@ -101,7 +131,8 @@ function c_vs_x() {
             }).appendTo("body").fadeIn(200);
         }
          
-        $("#profile").bind("plothover", function (event, pos, item) {
+        var previousPoint=null;
+        $("#profile #detailContainer").bind("plothover", function (event, pos, item) {
             if (item) {
                 if ((previousPoint != item.dataIndex) || (previousLabel != item.series.label)) {
                     previousPoint = item.dataIndex;
@@ -123,7 +154,62 @@ function c_vs_x() {
             }
         });
 
-    }
+        var masterOptions = {           
+             series: {
+                lines: {
+                    show: true
+                },
+                points: {
+                    show: false
+                }
+            },
+            grid: {                
+                backgroundColor: { colors: ["#96CBFF", "#75BAFF"] }
+            },
+            yaxis:{
+                color:"#FAF9CF",
+                axisLabel: 'C',
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 15,
+                axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding: 8,
+                min:orig_axes.yaxis.min,
+                max: orig_axes.yaxis.max
+            },
+            xaxis:{              
+                color:"#8400FF",
+                axisLabel: 'X',
+                axisLabelUseCanvas: true,
+                axisLabelFontSizePixels: 15,
+                axisLabelFontFamily: 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+                axisLabelPadding: 8,
+                min: orig_axes.xaxis.min,
+                max: orig_axes.xaxis.max
+            },
+            selection:{
+                mode: "xy"
+            }
+        };
+         
+        plotMaster = $.plot($("#profile #masterContainer"),
+                                  [{data:pro_plot, color:"#FF7575"}],
+                                    masterOptions
+        );
+     
+        $("#profile #detailContainer").bind("plotselected", function (event, ranges) {        
+            plotDetail = $.plot($("#profile #detailContainer"), [pro_plot],
+                  $.extend(true, {}, detailOptions, {
+                      xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to },
+                      yaxis: { min: ranges.yaxis.from, max: ranges.yaxis.to }
+                  }));
+     
+            plotMaster.setSelection(ranges, true);
+            });
+ 
+        $("#profile #masterContainer").bind("plotselected", function (event, ranges) {
+        plotDetail.setSelection(ranges);
+                });
+            }
 };
 // before plume hit's the ground
 // function C_eq1(Q, sigy, sigz, Us, y, z, H) {

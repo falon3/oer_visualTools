@@ -7,8 +7,11 @@
     <script type='text/javascript' src='assets/js/math.min.js'></script>
     <!--[if lte IE 8]><script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/excanvas.min.js"></script><![endif]-->
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.min.js"></script>
+    <script type="text/javascript" src="assets/js/jquery.flot.selection.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.2/jquery.flot.symbol.min.js"></script>
+
     <script type="text/javascript" src="assets/js/jquery.flot.axislabels.js"></script>
+    
 
     <script type="text/javascript" 
           src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.4/MathJax.js?config=TeX-AMS_HTML-full"></script>
@@ -239,8 +242,10 @@
 
         <div class="sideview" id="chart_div"></div> <!-- //sidevioew -->
          <div class="topview" id="map"></div>  <!-- topview -->
-          <div style="margin-top: 20px;" class="ccenprofile" id="profile"></div>  <!-- c vs x profile -->
-
+          <div style="margin-top: 20px;" class="ccenprofile" id="profile">
+              <div id="detailContainer" style="width: 100%;height:60%;margin-top:10px; text-align: left;"></div>        
+                <div id="masterContainer" style="width: 100%;height:40%;margin-top:10px;"></div>
+          </div>   <!-- c vs x profile -->
 
         <div id="data">
        <label for="QRange"><input name="Q" class="sliderout" id="QOut" oninput="QRange.value=QOut.value"></input></label><br>
@@ -282,8 +287,8 @@
        <label for="XmaxRange"><input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> </label><br>  
        <input class="userdata" type="range" name="Xmax" id="XmaxRange" oninput="XmaxOut.value = XmaxRange.value"><br>
 
-       <!-- FOR TOPVIEW ONNLY -->
-       <span class="topview" id="zSpan">
+       <!-- FOR TOPVIEW and concentration profile ONNLY -->
+       <span class="topview ccenprofile" id="zSpan">
        <label for="z"></label><br>
        <select class="userdata" id="z">
       </select>

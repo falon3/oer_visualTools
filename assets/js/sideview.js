@@ -75,13 +75,15 @@ function make_plot(Us, H) {
                   }
                     for (j in z){
                        if (sigz[i]<(H/2.15)){
-                            c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
+                            var c = C_eq1(Q, sigy[i], sigz[i], Us, y, z[j], H);
                         }
                         else { //after plume hits the ground)   
-                            c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
+                            var c = C_eq2(Q, sigy[i], sigz[i], Us, y, z[j], H);
                        }
                        //console.log(['',x[i],z[i], c]);
                        if (c==0 && z[j]>H) continue; // more than half skip the empty zone
+                       //if ((z[j]-H)<5 && x[i] <20) console.log(x[i], z[j], c);
+                       
                        if (c!=0) to_plot.push(['',x[i],z[j], c]);
                           
                     }
