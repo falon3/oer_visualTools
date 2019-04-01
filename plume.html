@@ -176,6 +176,23 @@
       }
       /* END MAPVIEW LEGEND */
 
+      /*profile flot tooltip*/
+      #flot-tooltip {
+        font-size: 12px;
+        font-family: Verdana, Arial, sans-serif;
+        position: absolute;
+        display: none;
+        border: 2px solid;
+        padding: 2px;
+        background-color: #FFF;
+        opacity: 0.8;
+        -moz-border-radius: 5px;
+        -webkit-border-radius: 5px;
+        -khtml-border-radius: 5px;
+        border-radius: 5px;
+    }
+
+
     </style>
 
   </head>
@@ -220,10 +237,9 @@
             <div style = "margin-top:5px;" id="slider-range"></div>
         </div>
 
-
         <div class="sideview" id="chart_div"></div> <!-- //sidevioew -->
          <div class="topview" id="map"></div>  <!-- topview -->
-          <div style="height: 100%;" class="ccenprofile" id="profile"></div>  <!-- c vs x profile -->
+          <div style="margin-top: 20px;" class="ccenprofile" id="profile"></div>  <!-- c vs x profile -->
 
 
         <div id="data">

@@ -93,6 +93,36 @@ function c_vs_x() {
                 margin:10
                 }
         });
+        function showTooltip(x, y, contents, z) {
+            $('<div id="flot-tooltip">' + contents + '</div>').css({
+                top: y - 50,
+                left: Math.max(x - 100, 70),
+                'border-color': z,
+            }).appendTo("body").fadeIn(200);
+        }
+         
+        $("#profile").bind("plothover", function (event, pos, item) {
+            if (item) {
+                if ((previousPoint != item.dataIndex) || (previousLabel != item.series.label)) {
+                    previousPoint = item.dataIndex;
+                    previousLabel = item.series.label;
+                 
+                    $("#flot-tooltip").remove();
+     
+                    x = item.datapoint[0],
+                    y = item.datapoint[1];
+                    z = item.series.color;
+                         
+                    showTooltip(item.pageX, item.pageY,
+                        "X= " + x + " m <br> C= " + y.toFixed(2) + " μg/m<sup>3</sup>",
+                        z);
+                }
+            } else {
+                $("#flot-tooltip").remove();
+                previousPoint = null;            
+            }
+        });
+
     }
 };
 // before plume hit's the ground
