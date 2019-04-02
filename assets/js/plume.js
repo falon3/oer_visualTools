@@ -24,6 +24,8 @@ var ds = variables["ds"]["default"];
 var Ts = variables["Ts"]["default"];
 var Ta = variables["Ta"]["default"];
 var Pa = variables["Pa"]["default"];
+var Zinput = variables["Zinput"]["default"];
+var Yinput = variables["Yinput"]["default"];
 var z = Object.keys(variables['z']["default"])[0];
 var Cmin = 5;
 var Cmax = 250;
@@ -183,12 +185,13 @@ $( function() {
 
 
 // for toggling between buttons and pages
-var top_update = true;
+var top_update = false; // start with initial view false
 var side_update = true;
 var ccenpro_update = true;
 function show_Topview(){
     $(".sideview").css("display", "none");
     $(".ccenprofile").css("display", "none");
+    $("#ySpan").css("display", "none");
     $('.topview').css("display", "block");
     if (top_update == true){
         top_update = false;
@@ -198,8 +201,8 @@ function show_Topview(){
 function show_Sideview(){ 
     $('.topview').css("display", "none");
     $(".ccenprofile").css("display", "none");
-    $("#zSpan").css("display", "none");
     $(".sideview").css("display", "block");
+    $("#ySpan").css("display", "block");
     if (side_update == true) {
         side_update = false;
         initPlot();
@@ -209,6 +212,7 @@ function show_ccenprofile(){
     $('.topview').css("display", "none");
     $(".sideview").css("display", "none");
     $(".ccenprofile").css("display", "block");
+    $("#ySpan").css("display", "block");
     if (ccenpro_update == true) {
         ccenpro_update = false;
         c_vs_x();
@@ -275,12 +279,18 @@ function updateView(){
     }      
 }
 
+function restrictZinput(){
+    $("#ZinputRange").attr('max', h);
+    if ($("input[name='Zinput']").val()>h){
+        $("input[name='Zinput']").val(h);
+    }
+}
+
 $( document ).ready(function() {
-    $('.topview').css("display", "block");
-    $(".sideview").css("display", "none");
-    $(".ccenprofile").css("display", "none");
+    show_Topview();
     configVariables(); // including wd for topview
     labelWindDirection(); /// for topview
+    restrictZinput();
     initPlot();
     c_vs_x();
     console.log( "ready!" );
@@ -308,7 +318,10 @@ $( document ).ready(function() {
         ws = parseInt($("input[name='ws']").val());
         Q = parseInt($("input[name='Q']").val());
         h = parseInt($("input[name='h']").val());
+        restrictZinput();
         Xmax = $("input[name='Xmax']").val();
+        Zinput = $("input[name='Zinput']").val(); 
+        Yinput = $("input[name='Yinput']").val(); 
         Z1 = $("input[name='Z1']").val();
         Vs = $("input[name='Vs']").val();
         ds = $("input[name='ds']").val();

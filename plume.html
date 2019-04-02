@@ -287,14 +287,31 @@
        <label for="XmaxRange"><input name="Xmax" class="sliderout" id="XmaxOut" oninput="XmaxRange.value=XmaxOut.value"></input> </label><br>  
        <input class="userdata" type="range" name="Xmax" id="XmaxRange" oninput="XmaxOut.value = XmaxRange.value"><br>
 
-       <!-- FOR TOPVIEW and concentration profile ONNLY -->
-       <span id="zSpan">
+       <!-- FOR TOPVIEW  ONNLY -->
+       <span class="topview"id="zSpan">
        <label for="z"></label><br>
        <select class="userdata" id="z">
       </select>
       <br>
         </span>
       <!-- END FOR TOPVIEW ONNLY -->
+
+      <!-- FOR  concentration profile ONNLY -->
+      <span class="ccenprofile">
+       <label for="ZinputRange"><input name="Zinput" class="sliderout" id="ZinputOut" oninput="ZinputRange.value=ZinputOut.value"></input> </label><br>  
+       <input class="userdata" type="range" name="Zinput" id="ZinputRange" oninput="ZinputOut.value = ZinputRange.value"><br>
+       </span>
+       <!-- END FOR  concentration profile ONNLY -->
+
+       <!-- FOR  concentration profile  AND sideview ONNLY -->
+       <span id="ySpan">
+       <label for="YinputRange"><input name="Yinput" class="sliderout" id="YinputOut" oninput="YinputRange.value=YinputOut.value"></input> </label><br>  
+       <input class="userdata" type="range" name="Yinput" id="YinputRange" oninput="YinputOut.value = YinputRange.value"><br>
+      <br>
+      </span>
+      <!-- END FOR  concentration profile  AND sideview ONNLY -->
+        
+        
 
        <label for="sc">sc: Stability Class</label><br>
        <select class="sc" id="sc">

@@ -101,6 +101,24 @@ var variables = {
             "slider-min": 100, 
             "slider-max": 8000
         },
+        'Yinput': {
+            "label": "Y: ",
+            "default": 0,
+            "unit": 'm',
+            "type": "range",
+            "step": 1,
+            "slider-min": -1000, 
+            "slider-max": 1000
+        },
+        'Zinput': {
+            "label": "Z: ",
+            "default": 0,
+            "unit": 'm',
+            "type": "range",
+            "step": 1,
+            "slider-min": 0, 
+            "slider-max": 200 // restricted to max whatever h is
+        },
         //// NUMBERS
         'lat': { 
             "label": "Latitude:",

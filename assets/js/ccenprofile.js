@@ -8,13 +8,12 @@ function c_vs_x() {
         var Us = calculateUs();
         var deltaH = calculateDeltaH(Us);
         var H = h + deltaH;
-        var z_num; //convert z from the word decription to a number
-        if (z=="plume") z_num = H;
-        else if (z=="ground") z_num=0;
+        // var z = Zinput; //convert z from the word decription to a number
+        // var y = Yinput;
 
+        //console.log(z, y);
 
-        pro_plot = [[]];
-        var y = 0; 
+        pro_plot = [[]];      
         var x = [2, 4];           
         var k = 1;
         while (x[k] < Xmax-10){
@@ -69,10 +68,10 @@ function c_vs_x() {
                   }
 
                    if (sigz[i]<(H/2.15)){
-                        var c = C_eq1(Q, sigy[i], sigz[i], Us, y, z_num, H);
+                        var c = C_eq1(Q, sigy[i], sigz[i], Us, Yinput, Zinput, H);
                     }
                     else { //after plume hits the ground)   
-                        var c = C_eq2(Q, sigy[i], sigz[i], Us, y, z_num, H);
+                        var c = C_eq2(Q, sigy[i], sigz[i], Us, Yinput, Zinput, H);
                    }
                    // if (c==0 && z[j]>H) continue; // more than half skip the empty zone
                    if (c!=0) pro_plot.push([x[i], c]);      

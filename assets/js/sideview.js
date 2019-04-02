@@ -14,7 +14,7 @@ function initPlot() {
 function make_plot(Us, H) {
     with (Math) {
         to_plot = [[ 'ID', 'X', 'Z', 'Concentration']]; // reset data
-        var y = 0; // sideview from y=0
+        var y = Yinput; // sideview from y=0
         var x = [1, 5, 10];           
         var k = 2;
         while (x[k] < Xmax-10){
@@ -106,6 +106,7 @@ function drawChart() {
             return arr[index][3] >= Cmin;
             });
         filtered.unshift([ 'ID', 'X', 'Z', 'Concentration']);
+        if (filtered.length==1) filtered.push(['',0,0,null]);
         var data = google.visualization.arrayToDataTable(filtered);
 
         var options = {
