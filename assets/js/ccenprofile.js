@@ -14,10 +14,10 @@ function c_vs_x() {
         //console.log(z, y);
 
         pro_plot = [[]];      
-        var x = [2, 4];           
+        var x = [1, 2];           
         var k = 1;
         while (x[k] < Xmax-10){
-             x.push(x[k]+2);  
+             x.push(x[k]+1);  
              k=k+1;
         }
         

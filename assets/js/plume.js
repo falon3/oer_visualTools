@@ -27,11 +27,10 @@ var Pa = variables["Pa"]["default"];
 var Zinput = variables["Zinput"]["default"];
 var Yinput = variables["Yinput"]["default"];
 var z = Object.keys(variables['z']["default"])[0];
-var Cmin = 5;
-var Cmax = 250;
-var Zmax = 500;    
+var Cmin = 5; // set initaly but updated by user with slider
+var Cmax = 250; // set initaly but updated by user with slider  
 
-// COLOR CODES FOR MAPVIEW EGIONS
+// COLOR CODES FOR MAPVIEW EGIONS UPDATED WITH THE SLIDER BY THE USER 
 //each colored area with so much μg/m^3 concentration
 // level in μg/m^3
 // var polution_max = 100;
@@ -279,12 +278,79 @@ function updateView(){
     }      
 }
 
+// z max value depends on h
 function restrictZinput(){
     $("#ZinputRange").attr('max', h);
     if ($("input[name='Zinput']").val()>h){
         $("input[name='Zinput']").val(h);
     }
 }
+
+function exportToCsv(filename, rows) {
+    var processRow = function (row) {
+        var finalVal = '';
+        for (var j = 0; j < row.length; j++) {
+            var innerValue = row[j] === null ? '' : row[j].toString();
+            if (row[j] instanceof Date) {
+                innerValue = row[j].toLocaleString();
+            };
+            var result = innerValue.replace(/"/g, '""');
+            if (result.search(/("|,|\n)/g) >= 0)
+                result = '"' + result + '"';
+            if (j > 0)
+                finalVal += ',';
+            finalVal += result;
+        }
+        return finalVal + '\n';
+    };
+
+    var csvFile = '';
+    for (var i = 0; i < rows.length; i++) {
+        csvFile += processRow(rows[i]);
+    }
+
+    var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+    if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+    } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+            // Browsers that support HTML5 download attribute
+            var url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+}
+
+
+
+function exportConProfile(){
+    var to_skip = ["z","sc","sloc","lat","lon","wd"];
+    var args = [["input param", "value"]];
+    Object.keys(variables).forEach( function(val,i){
+        if (to_skip.indexOf(val)==-1){
+            if (variables[val]["type"]=="range"){
+                args.push([val, $("#"+val+"Range").val()] );
+            }
+            else if (variables[val]["type"]=="number"){
+                args.push([val, $("#"+val).val()] );
+            }
+            else if (val=="sc"){
+                args.push([val, sc]);
+            }
+        }
+    });
+    args.push(['','']); /// 2 blank rows
+    args.push(['X (meters)', 'Concentration (μg/m^3)']);
+    var all_data = args.concat(pro_plot);
+    exportToCsv("plume_concentration_profile_data.csv", all_data);
+}
+
 
 $( document ).ready(function() {
     show_Topview();

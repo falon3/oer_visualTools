@@ -1,5 +1,6 @@
 
 var to_plot = [[ 'ID', 'X', 'Z', 'Concentration']];
+var Zmax = 500;  // for vertical axis limit
 
 function initPlot() {
     var Us = calculateUs();
@@ -118,7 +119,7 @@ function drawChart() {
             bubble: {opacity: 0.6},
             chartArea:{width:'80%',height:'80%'},
             explorer: { keepInBounds: true },
-           width: Math.max(700,Xmax*0.50),
+           width: Math.max(800,Xmax*0.4),
            height: Math.max(600, Zmax*1.7)
         };
 
