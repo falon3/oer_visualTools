@@ -198,6 +198,7 @@ function show_Topview(){
 function show_Sideview(){ 
     $('.topview').css("display", "none");
     $(".ccenprofile").css("display", "none");
+    $("#zSpan").css("display", "none");
     $(".sideview").css("display", "block");
     if (side_update == true) {
         side_update = false;
