@@ -35,6 +35,13 @@ var Cmax = 250; // set initaly but updated by user with slider
 // level in μg/m^3
 // var polution_max = 100;
 // var polution_min = 5;
+
+var export_vars= {
+    'profile': ["Q", "ws", "h","Xmax","Z1","Vs","ds","Ts","Ta","Pa", "sc", "Zinput", "Yinput"],
+    'side': ["Q", "ws", "h","Xmax","Z1","Vs","ds","Ts","Ta","Pa","sc", "Yinput", "Cmin", "Cmax"],
+    'top': [ "Q", "ws", "wd", "h","Xmax","Z1","Vs","ds","Ts","Ta","Pa", "z", "sc", "latitude", "longitude", "Cmin", "Cmax"]
+}
+
 var polution_levels = {
     0: {color: '#9FFF33', level: 5},
     1: {color: '#fbe37f', level: 20},
@@ -138,20 +145,20 @@ $( function() {
       range: true,
       min: 1,
       max: 800,
-      values: [ 5, 100],
+      values: [ Cmin, Cmax],
       slide: function( event, ui ) {  
         $( "#topamount" ).val( ui.values[ 0 ] +" - "+  ui.values[ 1 ] +"+");
         },
         change: function( event, ui ){
             var levels = Object.keys(polution_levels);   
-            var vmin = ui.values[ 0 ];
-            var vmax = ui.values[ 1 ];
-            var multiplier = Math.floor((vmax-vmin)/(levels.length+1));
+            Cmin = ui.values[ 0 ];
+            Cmax = ui.values[ 1 ];
+            var multiplier = Math.floor((Cmax-Cmin)/(levels.length+1));
             for (var i=0; i<levels.length/2 ;i++){
-                 polution_levels[i]['level']=vmin+(i*multiplier);
+                 polution_levels[i]['level']=Cmin+(i*multiplier);
             }
             for (var i=levels.length-1, j=0; i>=levels.length/2; i--){
-                 polution_levels[i]['level']=vmax-(j*multiplier);
+                 polution_levels[i]['level']=Cmax-(j*multiplier);
                  j = j+1;
             }
             drawNewMap();  
@@ -329,26 +336,65 @@ function exportToCsv(filename, rows) {
 
 
 
-function exportConProfile(){
-    var to_skip = ["z","sc","sloc","lat","lon","wd"];
+
+function exportData(){
+    var mode = window.location.href.split("#")[1];
+    var title = '';
+    var all_data = [];
+
     var args = [["input param", "value"]];
-    Object.keys(variables).forEach( function(val,i){
-        if (to_skip.indexOf(val)==-1){
-            if (variables[val]["type"]=="range"){
-                args.push([val, $("#"+val+"Range").val()] );
-            }
-            else if (variables[val]["type"]=="number"){
-                args.push([val, $("#"+val).val()] );
-            }
-            else if (val=="sc"){
-                args.push([val, sc]);
-            }
+    export_vars[mode].forEach(function(val,i){
+        if (val=="Cmin"){
+            args.push(["concentration min", Cmin]);
         }
+        else if (val=="Cmax"){
+            args.push(["concentration max", Cmax]);
+        }
+        else if (variables[val]["type"]=="range"){
+            args.push([val, $("#"+val+"Range").val()] );
+        }
+        else if (variables[val]["type"]=="number"){
+            args.push([val, $("#"+val).val()] );
+        }
+        else if (val=="sc"){
+            args.push([val, sc]);
+        }
+        else if (val=="z"){
+            args.push(["z-axis", z]);
+        }
+        
     });
     args.push(['','']); /// 2 blank rows
-    args.push(['X (meters)', 'Concentration (μg/m^3)']);
-    var all_data = args.concat(pro_plot);
-    exportToCsv("plume_concentration_profile_data.csv", all_data);
+
+    if (mode=="profile"){
+        args.push(['X (meters)', 'Concentration (μg/m^3)']);
+        all_data = args.concat(pro_plot);
+        title = "plume_concentration_profile_data.csv"
+    }
+    else if (mode=="side"){
+        args.push(['X (meters)', 'Z (meters)', 'Concentration (μg/m^3)']);
+        var filtered = to_plot.filter(function(value, index, arr){
+            return arr[index][3] >= Cmin;
+        });
+        filtered.forEach( function(entry, i){
+            args.push(entry.splice(1,3));
+        })
+        all_data=args;
+        title = "side_view_data.csv";
+    }
+    // else if (mode=="top"){
+    //     args.push(['X (meters)', 'Z (meters)', 'Concentration (μg/m^3)']);
+    //     var filtered = to_plot.filter(function(value, index, arr){
+    //         return arr[index][3] >= Cmin;
+    //     });
+    //     filtered.forEach( function(entry, i){
+    //         args.push(entry.splice(1,3));
+    //     })
+    //     all_data=args;
+    //     title = "side_view_data.csv";
+    // }
+    
+    exportToCsv(title, all_data);
 }
 
 
