@@ -318,11 +318,11 @@ function xy_to_latlon(x, y, olon, olat, rotation_angle_degs, xoffset, yoffset){
 function labelWindDirection(){
     var wstring = "";
     var display_wd = $("#wdOut").val();
-    if ((0<=display_wd && display_wd<90) || (270<display_wd && display_wd<360)) wstring= "N";
-    if (90<display_wd && display_wd<=180) wstring = "S";
+    if ((0<=display_wd && display_wd<90) || (270<display_wd && display_wd<360)) wstring= "S";
+    if (90<display_wd && display_wd<=180 || (180<display_wd && display_wd<270)) wstring = "N";
 
-    if (0<display_wd && display_wd<180) wstring=wstring.concat("E");
-    if (180<display_wd && display_wd<360) wstring=wstring.concat("W");
+    if (0<display_wd && display_wd<180) wstring=wstring.concat("W");
+    if (180<display_wd && display_wd<360) wstring=wstring.concat("E");
 
     $("#wdLetter").html("&#176;"+wstring);
 }

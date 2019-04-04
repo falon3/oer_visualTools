@@ -116,7 +116,10 @@ function drawChart() {
             hAxis: {title: 'X (meters)', maxValue:Math.max(500, Xmax)},
             vAxis: {title: 'Z (meters)', maxValue:Math.max(300, Zmax), viewWindowMode:'pretty'},//maxValue:Math.max(400, Zmax)},
             sortBubblesBySize: false,
-            bubble: {opacity: 0.6},
+            bubble: {opacity: 0.6,
+                stroke: 'none'
+            },
+            backgroundColor: {stroke: 'white'},
             chartArea:{width:'80%',height:'80%'},
             explorer: { keepInBounds: true },
            width: Math.max(800,Xmax*0.4),
