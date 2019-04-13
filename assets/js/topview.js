@@ -54,7 +54,7 @@ function translate_coordinates(strokeColor, zone, Us, hprime) {
         var bounceCoords = [];
         var bounce_y = [];
 
-        var deltaHfinal = null;
+        //var deltaHfinal = null;
         var Fb = calculateFb();
         var stability = stability_map[sc[1]];
         var Xf = calculateXf(Us,Fb,stability);
@@ -90,13 +90,12 @@ function translate_coordinates(strokeColor, zone, Us, hprime) {
         var blatLng = {};
         
         for (i in x){
-                // calculate deltah for increases until deltaHfinal
+                // calculate deltah for increases until x=>Xf (deltaHfinal) and after
                 if (x[i]<Xf){
-                    var deltaH = calculateDeltaH(Us,Fb,stability, x[i]); 
-                    deltaHfinal = deltaH;
+                    var deltaH = calculateDeltaHrise(Us,Fb,stability, x[i]); 
                 }
                 else {
-                    var deltaH = deltaHfinal;
+                    var deltaH = calculateDeltaHfinal(Us,Fb,stability, x[i]);
                 }
                 var H = hprime + deltaH;
 

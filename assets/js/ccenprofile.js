@@ -20,8 +20,7 @@ function c_vs_x() {
         while (x[k] < Xmax-10){
              x.push(x[k]+1);  
              k=k+1;
-        }
-        
+        }        
         var sigy =[];
         var sigz =[];
       
@@ -32,11 +31,10 @@ function c_vs_x() {
 
         for (i in x){
                 if (x[i]<Xf){
-                    var deltaH = calculateDeltaH(Us,Fb,stability, x[i]); // calculate deltah for increases until deltaHfinal
-                    deltaHfinal = deltaH;
+                    var deltaH = calculateDeltaHrise(Us,Fb,stability, x[i]); 
                 }
                 else {
-                    var deltaH = deltaHfinal;
+                    var deltaH = calculateDeltaHfinal(Us,Fb,stability, x[i]);
                 }
                 var H = hprime + deltaH;
                 ///STABILITY CLASS A,B,C,D,E,F WITH 'R' RURAL OR 'U' URBAN  
