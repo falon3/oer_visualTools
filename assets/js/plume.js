@@ -14,6 +14,7 @@ var wd = variables["wd"]["default"];
 var ws = variables["ws"]["default"];
 var Q = variables["Q"]["default"];
 var sc= Object.keys(variables['sloc']["default"])[0] + Object.keys(variables['sc']["default"])[0];
+var deltaHapproach = Object.keys(variables['deltaHapproach']["default"])[0];
 var latitude = variables["lat"]["default"];
 var longitude = variables["lon"]["default"];
 var h = variables["h"]["default"];
@@ -37,9 +38,9 @@ var Cmax = 250; // set initaly but updated by user with slider
 // var polution_min = 5;
 
 var export_vars= {
-    'profile': ["Q", "ws", "h","Xmax","Z1","Vs","ds","Ts","Ta","Pa", "sc", "Zinput", "Yinput"],
-    'side': ["Q", "ws", "h","Xmax","Z1","Vs","ds","Ts","Ta","Pa","sc", "Yinput", "Cmin", "Cmax"],
-    'top': [ "Q", "ws", "wd", "h","Xmax","Z1","Vs","ds","Ts","Ta","Pa", "z", "sc", "latitude", "longitude", "Cmin", "Cmax"]
+    'profile': ["Q", "ws", "h", "deltaHapproach", "Xmax","Z1","Vs","ds","Ts","Ta","Pa", "sc", "Zinput", "Yinput"],
+    'side': ["Q", "ws", "h", "deltaHapproach", "Xmax","Z1","Vs","ds","Ts","Ta","Pa","sc", "Yinput", "Cmin", "Cmax"],
+    'top': [ "Q", "ws", "wd", "h", "deltaHapproach", "Xmax","Z1","Vs","ds","Ts","Ta","Pa", "z", "sc", "latitude", "longitude", "Cmin", "Cmax"]
 }
 
 var polution_levels = {
@@ -233,6 +234,18 @@ function calculateDeltaHfinal(Us, Fb, stability,x_down){
 
     //var deltaH = ((Vs*ds)/Us)*(1.5+ 0.00268*Pa*ds*((Ts-Ta)/Ts)); //OLD CONSTANT WAY
     return Math.max(deltaH_buoyant,deltaH_momentum);
+}
+
+// HOLLAND EQUATION
+//  deltaH is the Plume Rise in meters
+//  "Vs": vertical stack gas velocity (m/sec)
+//  "ds": inside diameter of stack (m)
+//  "Ts": temp of exhaust gas stream at stack outlet (K)
+//  "Ta": temp of the atmosphere at stack outlet (K)
+//  "Pa": atmospheric pressure at ground level (mb)
+function calculateDeltaHholland(Us){
+    var deltaH = ((Vs*ds)/Us)*(1.5+ 0.00268*Pa*ds*((Ts-Ta)/Ts));
+    return deltaH
 }
 
 // before plume hit's the ground
@@ -483,6 +496,9 @@ function exportData(){
         else if (val=="z"){
             args.push(["z-axis", z]);
         }
+        else if (val=="deltaHapproach"){
+            args.push(["delta_h approach", deltaHapproach]);
+        }
         
     });
     args.push(['','']); /// 2 blank rows
@@ -554,6 +570,12 @@ $( document ).ready(function() {
         sc = sloc+cl;
         updateView(); 
     });
+    $("#deltaHapproach").on('change', function(){
+        deltaHapproach = $(this).val();
+        //console.log(deltaHapproach);
+        updateView(); 
+    });
+
 
     $('#data').on('change', 'input', 'select', function () {
         console.log("change");
